@@ -21,7 +21,6 @@ import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -40,7 +39,7 @@ public class Floor {
     @DatabaseField(columnName = NAME, unique = true, canBeNull = false)
     private String name;
 
-    @ForeignCollectionField(orderAscending = true, orderColumnName = Place.NAME)
+    @ForeignCollectionField(orderAscending = true, orderColumnName = Place.NAME, eager = true)
     private ForeignCollection<Place> placeCollection;
 
     @DatabaseField(persisted = false)
@@ -67,11 +66,7 @@ public class Floor {
     }
 
     public List<Place> getPlaceList() {
-        if (placeList == null) {
-            return Arrays.asList(this.getPlaceCollection().toArray(new Place[this.getPlaceCollection().size()]));
-        } else {
             return placeList;
-        }
     }
 
     public void setPlaceList(List<Place> placeList) {
@@ -79,7 +74,7 @@ public class Floor {
     }
     
     public int getPlaceListSize() {
-        return this.getPlaceCollection().size();
+        return placeList.size();
     }    
 
     @Override

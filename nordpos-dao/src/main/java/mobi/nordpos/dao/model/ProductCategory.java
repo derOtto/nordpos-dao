@@ -1,6 +1,6 @@
 /**
  * Copyright (c) 2012-2015 Nord Trading Network.
- * 
+ *
  * http://www.nordpos.mobi
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -22,7 +22,6 @@ import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -48,7 +47,7 @@ public class ProductCategory {
     @DatabaseField(columnName = IMAGE, dataType = DataType.BYTE_ARRAY, canBeNull = true)
     private byte[] image;
 
-    @ForeignCollectionField(orderAscending = true, orderColumnName = Product.NAME)
+    @ForeignCollectionField(orderAscending = true, orderColumnName = Product.NAME, eager = true)
     private ForeignCollection<Product> productCollection;
 
     @DatabaseField(persisted = false)
@@ -91,21 +90,17 @@ public class ProductCategory {
     }
 
     public List<Product> getProductList() {
-        if (productList == null) {
-            return Arrays.asList(this.getProductCollection().toArray(new Product[this.getProductCollection().size()]));
-        } else {
-            return productList;
-        }
+        return productList;
     }
-    
+
     public void setProductList(List<Product> productList) {
         this.productList = productList;
     }
 
     public int getProductListSize() {
-        return this.getProductCollection().size();
+        return productList.size();
     }
-    
+
     @Override
     public int hashCode() {
         return name.hashCode();

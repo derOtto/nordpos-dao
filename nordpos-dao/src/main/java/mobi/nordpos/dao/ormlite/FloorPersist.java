@@ -18,12 +18,17 @@
 package mobi.nordpos.dao.ormlite;
 
 import com.j256.ormlite.dao.BaseDaoImpl;
+import com.j256.ormlite.dao.CloseableWrappedIterable;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.support.ConnectionSource;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import mobi.nordpos.dao.model.Floor;
+import mobi.nordpos.dao.model.Place;
+import mobi.nordpos.dao.model.Product;
+import mobi.nordpos.dao.model.ProductCategory;
 
 /**
  * @author Andrey Svininykh <svininykh@gmail.com>
@@ -48,5 +53,19 @@ public class FloorPersist extends BaseDaoImpl<Floor, String> {
             }
         }
     }
+    
+    public List<Place> readPlaceList(Floor floor) throws SQLException {
+        CloseableWrappedIterable<Place> iterator = floor.getPlaceCollection().getWrappedIterable();
+        List<Place> list = new ArrayList<>();
+        try {
+            for (Place place : iterator) {
+                list.add(place);
+            }
+            return list;
+        } finally {
+            iterator.close();
+        }
+    }      
+    
 
 }

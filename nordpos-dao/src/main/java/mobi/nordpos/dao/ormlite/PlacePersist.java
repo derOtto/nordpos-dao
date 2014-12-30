@@ -18,11 +18,14 @@
 package mobi.nordpos.dao.ormlite;
 
 import com.j256.ormlite.dao.BaseDaoImpl;
+import com.j256.ormlite.dao.CloseableWrappedIterable;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.support.ConnectionSource;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
+import mobi.nordpos.dao.model.Floor;
 import mobi.nordpos.dao.model.Place;
 
 /**

@@ -1,6 +1,6 @@
 /**
  * Copyright (c) 2012-2015 Nord Trading Network.
- * 
+ *
  * http://www.nordpos.mobi
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -18,11 +18,15 @@
 package mobi.nordpos.dao.ormlite;
 
 import com.j256.ormlite.dao.BaseDaoImpl;
+import com.j256.ormlite.dao.CloseableWrappedIterable;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.support.ConnectionSource;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import mobi.nordpos.dao.model.Product;
+import mobi.nordpos.dao.model.ProductCategory;
 
 /**
  * @author Andrey Svininykh <svininykh@gmail.com>
@@ -58,4 +62,5 @@ public class ProductPersist extends BaseDaoImpl<Product, String> {
             }
         }
     }
+
 }
