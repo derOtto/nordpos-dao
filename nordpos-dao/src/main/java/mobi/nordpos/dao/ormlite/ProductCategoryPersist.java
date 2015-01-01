@@ -18,7 +18,6 @@
 package mobi.nordpos.dao.ormlite;
 
 import com.j256.ormlite.dao.BaseDaoImpl;
-import com.j256.ormlite.dao.CloseableIterator;
 import com.j256.ormlite.dao.CloseableWrappedIterable;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.QueryBuilder;
@@ -64,5 +63,62 @@ public class ProductCategoryPersist extends BaseDaoImpl<ProductCategory, String>
         } finally {
             iterator.close();
         }
-    }    
+    }
+
+    public ProductCategory read(String id) throws SQLException {
+        try {
+            productCategoryDao = new ProductCategoryPersist(connectionSource);
+            return productCategoryDao.queryForId(id);
+        } finally {
+            if (connectionSource != null) {
+                connectionSource.close();
+            }
+        }
+    }
+
+    public ProductCategory find(String column, String value) throws SQLException {
+        try {
+            productCategoryDao = new ProductCategoryPersist(connectionSource);
+            QueryBuilder qb = productCategoryDao.queryBuilder();
+            qb.where().like(column, value);
+            return (ProductCategory) qb.queryForFirst();
+        } finally {
+            if (connectionSource != null) {
+                connectionSource.close();
+            }
+        }
+    }
+
+    public ProductCategory add(ProductCategory category) throws SQLException {
+        try {
+            productCategoryDao = new ProductCategoryPersist(connectionSource);
+            return productCategoryDao.createIfNotExists(category);
+        } finally {
+            if (connectionSource != null) {
+                connectionSource.close();
+            }
+        }
+    }
+
+    public Boolean change(ProductCategory category) throws SQLException {
+        try {
+            productCategoryDao = new ProductCategoryPersist(connectionSource);
+            return productCategoryDao.update(category) > 0;
+        } finally {
+            if (connectionSource != null) {
+                connectionSource.close();
+            }
+        }
+    }
+
+    public Boolean delete(String id) throws SQLException {
+        try {
+            productCategoryDao = new ProductCategoryPersist(connectionSource);
+            return productCategoryDao.deleteById(id) > 0;
+        } finally {
+            if (connectionSource != null) {
+                connectionSource.close();
+            }
+        }
+    }
 }

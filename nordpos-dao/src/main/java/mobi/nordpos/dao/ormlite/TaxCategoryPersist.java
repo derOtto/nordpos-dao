@@ -1,6 +1,6 @@
 /**
  * Copyright (c) 2012-2015 Nord Trading Network.
- * 
+ *
  * http://www.nordpos.mobi
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -21,6 +21,7 @@ import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.support.ConnectionSource;
 import java.sql.SQLException;
+import java.util.List;
 import mobi.nordpos.dao.model.TaxCategory;
 
 /**
@@ -34,4 +35,14 @@ public class TaxCategoryPersist extends BaseDaoImpl<TaxCategory, String> {
         super(connectionSource, TaxCategory.class);
     }
 
+    public List<TaxCategory> readList() throws SQLException {
+        try {
+            taxCategoryDao = new TaxCategoryPersist(connectionSource);
+            return taxCategoryDao.queryForAll();
+        } finally {
+            if (connectionSource != null) {
+                connectionSource.close();
+            }
+        }
+    }
 }
