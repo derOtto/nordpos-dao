@@ -19,6 +19,9 @@ package mobi.nordpos.dao.model;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
+import com.openbravo.pos.util.Hashcypher;
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 
 /**
@@ -94,10 +97,14 @@ public class User {
         return password;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setPassword(String password) throws UnsupportedEncodingException, NoSuchAlgorithmException {
+        this.password = Hashcypher.hashString(password);
     }
 
+    public boolean isAuthentication(String password) throws UnsupportedEncodingException, NoSuchAlgorithmException {
+        return Hashcypher.authenticate(this.password, password);        
+    }
+    
     @Override
     public int hashCode() {
         return name.hashCode();
