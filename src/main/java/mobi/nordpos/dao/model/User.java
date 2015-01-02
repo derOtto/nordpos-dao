@@ -102,7 +102,7 @@ public class User {
     }
 
     public boolean isAuthentication(String password) throws UnsupportedEncodingException, NoSuchAlgorithmException {
-        return Hashcypher.authenticate(this.password, password);        
+        return Hashcypher.authenticate(password, this.password);        
     }
     
     @Override
