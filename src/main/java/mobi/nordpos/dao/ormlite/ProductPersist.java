@@ -17,8 +17,6 @@
  */
 package mobi.nordpos.dao.ormlite;
 
-import com.j256.ormlite.dao.BaseDaoImpl;
-import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.support.ConnectionSource;
 import java.sql.SQLException;
@@ -28,18 +26,21 @@ import mobi.nordpos.dao.model.Product;
 /**
  * @author Andrey Svininykh <svininykh@gmail.com>
  */
-public class ProductPersist extends BaseDaoImpl<Product, String> {
+public class ProductPersist implements PersistFactory {
 
-    Dao<Product, String> productDao;
+    ConnectionSource connectionSource;
+    ProductDao productDao;
 
-    public ProductPersist(ConnectionSource connectionSource) throws SQLException {
-        super(connectionSource, Product.class);
+    @Override
+    public void init(ConnectionSource connectionSource) throws SQLException {
+        this.connectionSource = connectionSource;
+        productDao = new ProductDao(connectionSource);
     }
 
-    public Product read(String id) throws SQLException {
+    @Override
+    public Product read(Object id) throws SQLException {
         try {
-            productDao = new ProductPersist(connectionSource);
-            return productDao.queryForId(id);
+            return productDao.queryForId((String) id);
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -47,9 +48,9 @@ public class ProductPersist extends BaseDaoImpl<Product, String> {
         }
     }
 
-    public Product find(String column, String value) throws SQLException {
+    @Override
+    public Product find(String column, Object value) throws SQLException {
         try {
-            productDao = new ProductPersist(connectionSource);
             QueryBuilder qb = productDao.queryBuilder();
             qb.where().like(column, value);
             return (Product) qb.queryForFirst();
@@ -60,9 +61,41 @@ public class ProductPersist extends BaseDaoImpl<Product, String> {
         }
     }
 
+    @Override
+    public Product add(Object product) throws SQLException {
+        try {
+            return productDao.createIfNotExists((Product) product);
+        } finally {
+            if (connectionSource != null) {
+                connectionSource.close();
+            }
+        }
+    }
+
+    @Override
+    public Boolean change(Object product) throws SQLException {
+        try {
+            return productDao.update((Product) product) > 0;
+        } finally {
+            if (connectionSource != null) {
+                connectionSource.close();
+            }
+        }
+    }
+
+    @Override
+    public Boolean delete(Object id) throws SQLException {
+        try {
+            return productDao.deleteById((String) id) > 0;
+        } finally {
+            if (connectionSource != null) {
+                connectionSource.close();
+            }
+        }
+    }
+
     public List<Product> listByCodePrefix(String prefix) throws SQLException {
         try {
-            productDao = new ProductPersist(connectionSource);
             QueryBuilder qb = productDao.queryBuilder();
             qb.where().like(Product.CODE, prefix.concat("%"));
             return qb.query();
@@ -72,38 +105,4 @@ public class ProductPersist extends BaseDaoImpl<Product, String> {
             }
         }
     }
-
-    public Product add(Product product) throws SQLException {
-        try {
-            productDao = new ProductPersist(connectionSource);
-            return productDao.createIfNotExists(product);
-        } finally {
-            if (connectionSource != null) {
-                connectionSource.close();
-            }
-        }
-    }
-
-    public Boolean change(Product product) throws SQLException {
-        try {
-            productDao = new ProductPersist(connectionSource);
-            return productDao.update(product) > 0;
-        } finally {
-            if (connectionSource != null) {
-                connectionSource.close();
-            }
-        }
-    }
-
-    public Boolean delete(String id) throws SQLException {
-        try {
-            productDao = new ProductPersist(connectionSource);
-            return productDao.deleteById(id) > 0;
-        } finally {
-            if (connectionSource != null) {
-                connectionSource.close();
-            }
-        }
-    }
-
 }

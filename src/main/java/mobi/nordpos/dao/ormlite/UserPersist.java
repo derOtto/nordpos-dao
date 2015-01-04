@@ -1,6 +1,6 @@
 /**
  * Copyright (c) 2012-2015 Nord Trading Network.
- * 
+ *
  * http://www.nordpos.mobi
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -17,12 +17,7 @@
  */
 package mobi.nordpos.dao.ormlite;
 
-import com.j256.ormlite.dao.BaseDaoImpl;
-import com.j256.ormlite.dao.Dao;
-import com.j256.ormlite.dao.DaoManager;
-import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.stmt.QueryBuilder;
-import com.j256.ormlite.stmt.SelectArg;
 import com.j256.ormlite.support.ConnectionSource;
 import java.sql.SQLException;
 import java.util.UUID;
@@ -31,23 +26,21 @@ import mobi.nordpos.dao.model.User;
 /**
  * @author Andrey Svininykh <svininykh@gmail.com>
  */
-public class UserPersist extends BaseDaoImpl<User, UUID> {
+public class UserPersist implements PersistFactory {
 
-    Dao<User, UUID> userDao;
+    ConnectionSource connectionSource;
+    UserDao userDao;
 
-    public UserPersist(ConnectionSource connectionSource) throws SQLException {
-        super(connectionSource, User.class);
+    @Override
+    public void init(ConnectionSource connectionSource) throws SQLException {
+        this.connectionSource = connectionSource;
+        userDao = new UserDao(connectionSource);
     }
 
-    public User read(String name) throws SQLException {
+    @Override
+    public User read(Object id) throws SQLException {
         try {
-            userDao = new UserPersist(connectionSource);
-            QueryBuilder<User, UUID> statementBuilder = userDao.queryBuilder();
-            SelectArg selectArg = new SelectArg();
-            statementBuilder.where().like(User.NAME, selectArg);
-            selectArg.setValue(name);
-            PreparedQuery<User> preparedQuery = statementBuilder.prepare();
-            return userDao.queryForFirst(preparedQuery);
+            return userDao.queryForId((UUID) id);
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -55,10 +48,23 @@ public class UserPersist extends BaseDaoImpl<User, UUID> {
         }
     }
 
-    public User add(User user) throws SQLException {
+    @Override
+    public User find(String column, Object value) throws SQLException {
         try {
-            userDao = new UserPersist(connectionSource);
-            return userDao.createIfNotExists(user);
+            QueryBuilder qb = userDao.queryBuilder();
+            qb.where().like(column, value);
+            return (User) qb.queryForFirst();
+        } finally {
+            if (connectionSource != null) {
+                connectionSource.close();
+            }
+        }
+    }
+    
+    @Override
+    public User add(Object user) throws SQLException {
+        try {
+            return userDao.createIfNotExists((User) user);
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -66,10 +72,10 @@ public class UserPersist extends BaseDaoImpl<User, UUID> {
         }
     }
 
-    public Boolean change(User user) throws SQLException {
+    @Override
+    public Boolean change(Object user) throws SQLException {
         try {
-            userDao = new UserPersist(connectionSource);
-            return userDao.update(user) > 0;
+            return userDao.update((User) user) > 0;
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -77,4 +83,14 @@ public class UserPersist extends BaseDaoImpl<User, UUID> {
         }
     }
 
+    @Override
+    public Boolean delete(Object id) throws SQLException {
+        try {
+            return userDao.deleteById((UUID) id) > 0;
+        } finally {
+            if (connectionSource != null) {
+                connectionSource.close();
+            }
+        }
+    }
 }

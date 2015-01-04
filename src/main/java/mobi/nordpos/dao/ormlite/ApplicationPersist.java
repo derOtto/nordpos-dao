@@ -1,6 +1,6 @@
 /**
  * Copyright (c) 2012-2015 Nord Trading Network.
- * 
+ *
  * http://www.nordpos.mobi
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -17,8 +17,7 @@
  */
 package mobi.nordpos.dao.ormlite;
 
-import com.j256.ormlite.dao.BaseDaoImpl;
-import com.j256.ormlite.dao.Dao;
+import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.support.ConnectionSource;
 import java.sql.SQLException;
 import mobi.nordpos.dao.model.Application;
@@ -26,22 +25,53 @@ import mobi.nordpos.dao.model.Application;
 /**
  * @author Andrey Svininykh <svininykh@gmail.com>
  */
-public class ApplicationPersist extends BaseDaoImpl<Application, String> {
+public class ApplicationPersist implements PersistFactory {
 
-    Dao<Application, String> applicationDao;
+    ConnectionSource connectionSource;
+    ApplicationDao applicationDao;
 
-    public ApplicationPersist(ConnectionSource connectionSource) throws SQLException {
-        super(connectionSource, Application.class);
+    @Override
+    public void init(ConnectionSource connectionSource) throws SQLException {
+        this.connectionSource = connectionSource;
+        applicationDao = new ApplicationDao(connectionSource);
     }
 
-    public Application read(String id) throws SQLException {
+    @Override
+    public Application read(Object id) throws SQLException {
         try {
-            applicationDao = new ApplicationPersist(connectionSource);
-            return applicationDao.queryForId(id);
+            return applicationDao.queryForId((String)id);
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
             }
         }
+    }
+
+    @Override
+    public Application find(String column, Object value) throws SQLException {
+        try {
+            QueryBuilder qb = applicationDao.queryBuilder();
+            qb.where().like(column, value);
+            return (Application) qb.queryForFirst();
+        } finally {
+            if (connectionSource != null) {
+                connectionSource.close();
+            }
+        }
+    }
+
+    @Override
+    public Object add(Object value) throws SQLException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Boolean change(Object object) throws SQLException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Boolean delete(Object id) throws SQLException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
