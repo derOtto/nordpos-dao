@@ -1,6 +1,6 @@
 /**
  * Copyright (c) 2012-2015 Nord Trading Network.
- * 
+ *
  * http://www.nordpos.mobi
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -17,27 +17,30 @@
  */
 package mobi.nordpos.dao.ormlite;
 
-import com.j256.ormlite.dao.BaseDaoImpl;
-import com.j256.ormlite.dao.Dao;
+import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.support.ConnectionSource;
 import java.sql.SQLException;
+import java.util.List;
 import mobi.nordpos.dao.model.SharedTicket;
 
 /**
  * @author Andrey Svininykh <svininykh@gmail.com>
  */
-public class SharedTicketPersist extends BaseDaoImpl<SharedTicket, String> {
+public class SharedTicketPersist implements PersistFactory {
 
-    Dao<SharedTicket, String> sharedTicketDao;
+    ConnectionSource connectionSource;
+    SharedTicketDao sharedTicketDao;
 
-    public SharedTicketPersist(ConnectionSource connectionSource) throws SQLException {
-        super(connectionSource, SharedTicket.class);
+    @Override
+    public void init(ConnectionSource connectionSource) throws SQLException {
+        this.connectionSource = connectionSource;
+        sharedTicketDao = new SharedTicketDao(connectionSource);
     }
 
-    public SharedTicket read(String id) throws SQLException {
+    @Override
+    public SharedTicket read(Object id) throws SQLException {
         try {
-            sharedTicketDao = new SharedTicketPersist(connectionSource);
-            return sharedTicketDao.queryForId(id);
+            return sharedTicketDao.queryForId((String) id);
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -45,10 +48,10 @@ public class SharedTicketPersist extends BaseDaoImpl<SharedTicket, String> {
         }
     }
 
-    public SharedTicket add(SharedTicket ticket) throws SQLException {
+    @Override
+    public List<SharedTicket> readList() throws SQLException {
         try {
-            sharedTicketDao = new SharedTicketPersist(connectionSource);
-            return sharedTicketDao.createIfNotExists(ticket);
+            return sharedTicketDao.queryForAll();
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -56,10 +59,12 @@ public class SharedTicketPersist extends BaseDaoImpl<SharedTicket, String> {
         }
     }
 
-    public Boolean change(SharedTicket ticket) throws SQLException {
+    @Override
+    public SharedTicket find(String column, Object value) throws SQLException {
         try {
-            sharedTicketDao = new SharedTicketPersist(connectionSource);
-            return sharedTicketDao.update(ticket) > 0;
+            QueryBuilder qb = sharedTicketDao.queryBuilder();
+            qb.where().like(column, value);
+            return (SharedTicket) qb.queryForFirst();
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -67,10 +72,32 @@ public class SharedTicketPersist extends BaseDaoImpl<SharedTicket, String> {
         }
     }
 
-    public Boolean delete(String id) throws SQLException {
+    @Override
+    public SharedTicket add(Object ticket) throws SQLException {
         try {
-            sharedTicketDao = new SharedTicketPersist(connectionSource);
-            return sharedTicketDao.deleteById(id) > 0;
+            return sharedTicketDao.createIfNotExists((SharedTicket) ticket);
+        } finally {
+            if (connectionSource != null) {
+                connectionSource.close();
+            }
+        }
+    }
+
+    @Override
+    public Boolean change(Object ticket) throws SQLException {
+        try {
+            return sharedTicketDao.update((SharedTicket) ticket) > 0;
+        } finally {
+            if (connectionSource != null) {
+                connectionSource.close();
+            }
+        }
+    }
+
+    @Override
+    public Boolean delete(Object id) throws SQLException {
+        try {
+            return sharedTicketDao.deleteById((String) id) > 0;
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();

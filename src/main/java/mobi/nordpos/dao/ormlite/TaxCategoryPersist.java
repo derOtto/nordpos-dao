@@ -17,8 +17,6 @@
  */
 package mobi.nordpos.dao.ormlite;
 
-import com.j256.ormlite.dao.BaseDaoImpl;
-import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.support.ConnectionSource;
 import java.sql.SQLException;
@@ -51,6 +49,17 @@ public class TaxCategoryPersist implements PersistFactory {
     }
 
     @Override
+    public List<TaxCategory> readList() throws SQLException {
+        try {
+            return taxCategoryDao.queryForAll();
+        } finally {
+            if (connectionSource != null) {
+                connectionSource.close();
+            }
+        }
+    }
+
+    @Override
     public TaxCategory find(String column, Object value) throws SQLException {
         try {
             QueryBuilder qb = taxCategoryDao.queryBuilder();
@@ -63,9 +72,10 @@ public class TaxCategoryPersist implements PersistFactory {
         }
     }
 
-    public List<TaxCategory> readList() throws SQLException {
+    @Override
+    public TaxCategory add(Object taxCategory) throws SQLException {
         try {
-            return taxCategoryDao.queryForAll();
+            return taxCategoryDao.createIfNotExists((TaxCategory) taxCategory);
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -74,18 +84,25 @@ public class TaxCategoryPersist implements PersistFactory {
     }
 
     @Override
-    public Object add(Object value) throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public Boolean change(Object object) throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public Boolean change(Object taxCategory) throws SQLException {
+        try {
+            return taxCategoryDao.update((TaxCategory) taxCategory) > 0;
+        } finally {
+            if (connectionSource != null) {
+                connectionSource.close();
+            }
+        }
     }
 
     @Override
     public Boolean delete(Object id) throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        try {
+            return taxCategoryDao.deleteById((String) id) > 0;
+        } finally {
+            if (connectionSource != null) {
+                connectionSource.close();
+            }
+        }
     }
 
 }

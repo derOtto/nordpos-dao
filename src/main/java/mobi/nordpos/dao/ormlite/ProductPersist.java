@@ -49,6 +49,19 @@ public class ProductPersist implements PersistFactory {
     }
 
     @Override
+    public List<Product> readList() throws SQLException {
+        try {
+            QueryBuilder qb = productDao.queryBuilder().orderBy(Product.NAME, true);
+            qb.where().isNotNull(Product.ID);
+            return qb.query();
+        } finally {
+            if (connectionSource != null) {
+                connectionSource.close();
+            }
+        }
+    }
+
+    @Override
     public Product find(String column, Object value) throws SQLException {
         try {
             QueryBuilder qb = productDao.queryBuilder();

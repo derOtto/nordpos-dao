@@ -20,6 +20,7 @@ package mobi.nordpos.dao.ormlite;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.support.ConnectionSource;
 import java.sql.SQLException;
+import java.util.List;
 import mobi.nordpos.dao.model.Application;
 
 /**
@@ -46,6 +47,17 @@ public class ApplicationPersist implements PersistFactory {
             }
         }
     }
+    
+    @Override
+    public List<Application> readList() throws SQLException {
+        try {
+            return applicationDao.queryForAll();
+        } finally {
+            if (connectionSource != null) {
+                connectionSource.close();
+            }
+        }
+    }    
 
     @Override
     public Application find(String column, Object value) throws SQLException {
@@ -61,17 +73,35 @@ public class ApplicationPersist implements PersistFactory {
     }
 
     @Override
-    public Object add(Object value) throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public Application add(Object application) throws SQLException {
+        try {
+            return applicationDao.createIfNotExists((Application) application);
+        } finally {
+            if (connectionSource != null) {
+                connectionSource.close();
+            }
+        }
     }
 
     @Override
-    public Boolean change(Object object) throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public Boolean change(Object application) throws SQLException {
+        try {
+            return applicationDao.update((Application) application) > 0;
+        } finally {
+            if (connectionSource != null) {
+                connectionSource.close();
+            }
+        }
     }
 
     @Override
     public Boolean delete(Object id) throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        try {
+            return applicationDao.deleteById((String) id) > 0;
+        } finally {
+            if (connectionSource != null) {
+                connectionSource.close();
+            }
+        }
     }
 }

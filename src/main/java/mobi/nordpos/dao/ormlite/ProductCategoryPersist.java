@@ -50,6 +50,19 @@ public class ProductCategoryPersist implements PersistFactory {
             }
         }
     }
+    
+    @Override
+    public List<ProductCategory> readList() throws SQLException {
+        try {
+            QueryBuilder qb = productCategoryDao.queryBuilder().orderBy(ProductCategory.NAME, true);
+            qb.where().isNotNull(ProductCategory.ID);
+            return qb.query();
+        } finally {
+            if (connectionSource != null) {
+                connectionSource.close();
+            }
+        }
+    } 
 
     @Override
     public ProductCategory find(String column, Object value) throws SQLException {
@@ -90,18 +103,6 @@ public class ProductCategoryPersist implements PersistFactory {
     public Boolean delete(Object id) throws SQLException {
         try {
             return productCategoryDao.deleteById((String) id) > 0;
-        } finally {
-            if (connectionSource != null) {
-                connectionSource.close();
-            }
-        }
-    }
-
-    public List<ProductCategory> readList() throws SQLException {
-        try {
-            QueryBuilder qb = productCategoryDao.queryBuilder().orderBy(ProductCategory.NAME, true);
-            qb.where().isNotNull(ProductCategory.ID);
-            return qb.query();
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();

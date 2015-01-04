@@ -20,6 +20,7 @@ package mobi.nordpos.dao.ormlite;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.support.ConnectionSource;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.UUID;
 import mobi.nordpos.dao.model.User;
 
@@ -49,6 +50,19 @@ public class UserPersist implements PersistFactory {
     }
 
     @Override
+    public List<User> readList() throws SQLException {
+        try {
+            QueryBuilder qb = userDao.queryBuilder().orderBy(User.NAME, true);
+            qb.where().isNotNull(User.ID);
+            return qb.query();
+        } finally {
+            if (connectionSource != null) {
+                connectionSource.close();
+            }
+        }
+    }
+
+    @Override
     public User find(String column, Object value) throws SQLException {
         try {
             QueryBuilder qb = userDao.queryBuilder();
@@ -60,7 +74,7 @@ public class UserPersist implements PersistFactory {
             }
         }
     }
-    
+
     @Override
     public User add(Object user) throws SQLException {
         try {

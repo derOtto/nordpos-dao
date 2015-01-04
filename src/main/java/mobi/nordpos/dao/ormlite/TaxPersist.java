@@ -17,13 +17,12 @@
  */
 package mobi.nordpos.dao.ormlite;
 
-import com.j256.ormlite.dao.BaseDaoImpl;
-import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.support.ConnectionSource;
 import com.openbravo.pos.sales.TaxesLogic;
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.List;
 import mobi.nordpos.dao.model.Tax;
 
 /**
@@ -53,6 +52,17 @@ public class TaxPersist implements PersistFactory {
     }
 
     @Override
+    public List<Tax> readList() throws SQLException {
+        try {
+            return taxDao.queryForAll();
+        } finally {
+            if (connectionSource != null) {
+                connectionSource.close();
+            }
+        }
+    }
+
+    @Override
     public Tax find(String column, Object value) throws SQLException {
         try {
             QueryBuilder qb = taxDao.queryBuilder();
@@ -66,17 +76,35 @@ public class TaxPersist implements PersistFactory {
     }
 
     @Override
-    public Object add(Object value) throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public Tax add(Object tax) throws SQLException {
+        try {
+            return taxDao.createIfNotExists((Tax) tax);
+        } finally {
+            if (connectionSource != null) {
+                connectionSource.close();
+            }
+        }
     }
 
     @Override
-    public Boolean change(Object object) throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public Boolean change(Object tax) throws SQLException {
+        try {
+            return taxDao.update((Tax) tax) > 0;
+        } finally {
+            if (connectionSource != null) {
+                connectionSource.close();
+            }
+        }
     }
 
     @Override
     public Boolean delete(Object id) throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        try {
+            return taxDao.deleteById((String) id) > 0;
+        } finally {
+            if (connectionSource != null) {
+                connectionSource.close();
+            }
+        }
     }
 }

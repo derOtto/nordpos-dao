@@ -17,27 +17,21 @@
  */
 package mobi.nordpos.dao.ormlite;
 
+import com.j256.ormlite.dao.BaseDaoImpl;
+import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.support.ConnectionSource;
 import java.sql.SQLException;
-import java.util.List;
+import mobi.nordpos.dao.model.Floor;
 
 /**
  * @author Andrey Svininykh <svininykh@gmail.com>
  */
-public interface PersistFactory {
+public class FloorDao extends BaseDaoImpl<Floor, String> {
 
-    public void init(ConnectionSource connectionSource) throws SQLException;
+    Dao<Floor, String> floorDao;
 
-    public Object read(Object id) throws SQLException;
-
-    public List<? extends Object> readList() throws SQLException;
-
-    public Object find(String column, Object value) throws SQLException;
-
-    public Object add(Object value) throws SQLException;
-
-    public Boolean change(Object object) throws SQLException;
-
-    public Boolean delete(Object id) throws SQLException;
+    public FloorDao(ConnectionSource connectionSource) throws SQLException {
+        super(connectionSource, Floor.class);
+    }
 
 }
