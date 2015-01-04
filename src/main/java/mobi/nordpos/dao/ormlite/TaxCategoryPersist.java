@@ -19,6 +19,7 @@ package mobi.nordpos.dao.ormlite;
 
 import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.dao.Dao;
+import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.support.ConnectionSource;
 import java.sql.SQLException;
 import java.util.List;
@@ -27,17 +28,43 @@ import mobi.nordpos.dao.model.TaxCategory;
 /**
  * @author Andrey Svininykh <svininykh@gmail.com>
  */
-public class TaxCategoryPersist extends BaseDaoImpl<TaxCategory, String> {
+public class TaxCategoryPersist implements PersistFactory {
 
-    Dao<TaxCategory, String> taxCategoryDao;
+    ConnectionSource connectionSource;
+    TaxCategoryDao taxCategoryDao;
 
-    public TaxCategoryPersist(ConnectionSource connectionSource) throws SQLException {
-        super(connectionSource, TaxCategory.class);
+    @Override
+    public void init(ConnectionSource connectionSource) throws SQLException {
+        this.connectionSource = connectionSource;
+        taxCategoryDao = new TaxCategoryDao(connectionSource);
+    }
+
+    @Override
+    public TaxCategory read(Object id) throws SQLException {
+        try {
+            return taxCategoryDao.queryForId((String) id);
+        } finally {
+            if (connectionSource != null) {
+                connectionSource.close();
+            }
+        }
+    }
+
+    @Override
+    public TaxCategory find(String column, Object value) throws SQLException {
+        try {
+            QueryBuilder qb = taxCategoryDao.queryBuilder();
+            qb.where().like(column, value);
+            return (TaxCategory) qb.queryForFirst();
+        } finally {
+            if (connectionSource != null) {
+                connectionSource.close();
+            }
+        }
     }
 
     public List<TaxCategory> readList() throws SQLException {
         try {
-            taxCategoryDao = new TaxCategoryPersist(connectionSource);
             return taxCategoryDao.queryForAll();
         } finally {
             if (connectionSource != null) {
@@ -45,4 +72,20 @@ public class TaxCategoryPersist extends BaseDaoImpl<TaxCategory, String> {
             }
         }
     }
+
+    @Override
+    public Object add(Object value) throws SQLException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Boolean change(Object object) throws SQLException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Boolean delete(Object id) throws SQLException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
 }

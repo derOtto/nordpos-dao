@@ -1,6 +1,6 @@
 /**
  * Copyright (c) 2012-2015 Nord Trading Network.
- *
+ * 
  * http://www.nordpos.mobi
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -17,24 +17,21 @@
  */
 package mobi.nordpos.dao.ormlite;
 
+import com.j256.ormlite.dao.BaseDaoImpl;
+import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.support.ConnectionSource;
 import java.sql.SQLException;
-import java.util.List;
+import mobi.nordpos.dao.model.Tax;
 
 /**
  * @author Andrey Svininykh <svininykh@gmail.com>
  */
-public interface PersistFactory {
+public class TaxDao extends BaseDaoImpl<Tax, String> {
 
-    public void init(ConnectionSource connectionSource) throws SQLException;
+    Dao<Tax, String> taxDao;
 
-    public Object read(Object id) throws SQLException;
+    public TaxDao(ConnectionSource connectionSource) throws SQLException {
+        super(connectionSource, Tax.class);
+    }
 
-    public Object find(String column, Object value) throws SQLException;
-
-    public Object add(Object value) throws SQLException;
-
-    public Boolean change(Object object) throws SQLException;
-
-    public Boolean delete(Object id) throws SQLException;
 }

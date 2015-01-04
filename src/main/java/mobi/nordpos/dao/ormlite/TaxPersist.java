@@ -1,6 +1,6 @@
 /**
  * Copyright (c) 2012-2015 Nord Trading Network.
- * 
+ *
  * http://www.nordpos.mobi
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -19,6 +19,7 @@ package mobi.nordpos.dao.ormlite;
 
 import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.dao.Dao;
+import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.support.ConnectionSource;
 import com.openbravo.pos.sales.TaxesLogic;
 import java.sql.SQLException;
@@ -28,23 +29,54 @@ import mobi.nordpos.dao.model.Tax;
 /**
  * @author Andrey Svininykh <svininykh@gmail.com>
  */
-public class TaxPersist extends BaseDaoImpl<Tax, String> {
+public class TaxPersist implements PersistFactory {
 
-    Dao<Tax, String> taxDao;
+    ConnectionSource connectionSource;
+    TaxDao taxDao;
 
-    public TaxPersist(ConnectionSource connectionSource) throws SQLException {
-        super(connectionSource, Tax.class);
+    @Override
+    public void init(ConnectionSource connectionSource) throws SQLException {
+        this.connectionSource = connectionSource;
+        taxDao = new TaxDao(connectionSource);
     }
 
-    public Tax read(String taxCategoryId) throws SQLException {
+    @Override
+    public Tax read(Object taxCategoryId) throws SQLException {
         try {
-            taxDao = new TaxPersist(connectionSource);
             TaxesLogic taxLogic = new TaxesLogic(taxDao.queryForAll());
-            return taxLogic.getTax(taxCategoryId, new Date());
+            return taxLogic.getTax((String) taxCategoryId, new Date());
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
             }
         }
+    }
+
+    @Override
+    public Tax find(String column, Object value) throws SQLException {
+        try {
+            QueryBuilder qb = taxDao.queryBuilder();
+            qb.where().like(column, value);
+            return (Tax) qb.queryForFirst();
+        } finally {
+            if (connectionSource != null) {
+                connectionSource.close();
+            }
+        }
+    }
+
+    @Override
+    public Object add(Object value) throws SQLException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Boolean change(Object object) throws SQLException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Boolean delete(Object id) throws SQLException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
