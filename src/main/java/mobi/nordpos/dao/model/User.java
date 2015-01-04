@@ -17,6 +17,7 @@
  */
 package mobi.nordpos.dao.model;
 
+import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import com.openbravo.pos.util.Hashcypher;
@@ -35,7 +36,8 @@ public class User {
     public static final String PASSWORD = "APPPASSWORD";
     public static final String ROLE = "ROLE";
     public static final String VISIBLE = "VISIBLE";
-
+    public static final String IMAGE = "IMAGE";    
+    
     @DatabaseField(generatedId = true, columnName = ID)
     private UUID id;
 
@@ -47,12 +49,19 @@ public class User {
 
     private String card;
 
-    @DatabaseField(columnName = ROLE)
-    private String role;
+    @DatabaseField(foreign = true,
+            columnName = ROLE,
+            foreignColumnName = Role.ID,
+            foreignAutoRefresh = true,
+            canBeNull = false)
+    private Role role;
 
     @DatabaseField(columnName = VISIBLE, defaultValue = "true")
     private Boolean visible;
-
+    
+    @DatabaseField(columnName = IMAGE, dataType = DataType.BYTE_ARRAY, canBeNull = true)
+    private byte[] image;
+    
     public UUID getId() {
         return id;
     }
@@ -77,11 +86,11 @@ public class User {
         this.card = card;
     }
 
-    public String getRole() {
+    public Role getRole() {
         return role;
     }
 
-    public void setRole(String role) {
+    public void setRole(Role role) {
         this.role = role;
     }
 
@@ -92,6 +101,14 @@ public class User {
     public void setVisible(Boolean visible) {
         this.visible = visible;
     }
+    
+    public byte[] getImage() {
+        return image;
+    }
+
+    public void setImage(byte[] image) {
+        this.image = image;
+    }    
 
     public String getPassword() {
         return password;
