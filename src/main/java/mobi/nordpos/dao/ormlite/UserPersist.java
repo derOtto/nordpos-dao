@@ -21,7 +21,6 @@ import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.support.ConnectionSource;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.UUID;
 import mobi.nordpos.dao.model.User;
 
 /**
@@ -41,7 +40,7 @@ public class UserPersist implements PersistFactory {
     @Override
     public User read(Object id) throws SQLException {
         try {
-            return userDao.queryForId((UUID) id);
+            return userDao.queryForId((String) id);
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -100,7 +99,7 @@ public class UserPersist implements PersistFactory {
     @Override
     public Boolean delete(Object id) throws SQLException {
         try {
-            return userDao.deleteById((UUID) id) > 0;
+            return userDao.deleteById((String) id) > 0;
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();

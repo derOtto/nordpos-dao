@@ -27,9 +27,9 @@ import mobi.nordpos.dao.model.User;
 /**
  * @author Andrey Svininykh <svininykh@gmail.com>
  */
-public class UserDao extends BaseDaoImpl<User, UUID> {
+public class UserDao extends BaseDaoImpl<User, String> {
 
-    Dao<User, UUID> userDao;
+    Dao<User, String> userDao;
 
     protected UserDao(ConnectionSource connectionSource) throws SQLException {
         super(connectionSource, User.class);

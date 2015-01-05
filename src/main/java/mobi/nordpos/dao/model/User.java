@@ -1,6 +1,6 @@
 /**
  * Copyright (c) 2012-2015 Nord Trading Network.
- * 
+ *
  * http://www.nordpos.mobi
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -23,7 +23,6 @@ import com.j256.ormlite.table.DatabaseTable;
 import com.openbravo.pos.util.Hashcypher;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
-import java.util.UUID;
 
 /**
  * @author Andrey Svininykh <svininykh@gmail.com>
@@ -36,10 +35,10 @@ public class User {
     public static final String PASSWORD = "APPPASSWORD";
     public static final String ROLE = "ROLE";
     public static final String VISIBLE = "VISIBLE";
-    public static final String IMAGE = "IMAGE";    
-    
-    @DatabaseField(generatedId = true, columnName = ID)
-    private UUID id;
+    public static final String IMAGE = "IMAGE";
+
+    @DatabaseField(id = true, columnName = ID)
+    private String id;
 
     @DatabaseField(columnName = NAME, unique = true)
     private String name;
@@ -58,15 +57,15 @@ public class User {
 
     @DatabaseField(columnName = VISIBLE, defaultValue = "true")
     private Boolean visible;
-    
+
     @DatabaseField(columnName = IMAGE, dataType = DataType.BYTE_ARRAY, canBeNull = true)
     private byte[] image;
-    
-    public UUID getId() {
+
+    public String getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -101,14 +100,14 @@ public class User {
     public void setVisible(Boolean visible) {
         this.visible = visible;
     }
-    
+
     public byte[] getImage() {
         return image;
     }
 
     public void setImage(byte[] image) {
         this.image = image;
-    }    
+    }
 
     public String getPassword() {
         return password;
@@ -119,9 +118,9 @@ public class User {
     }
 
     public boolean isAuthentication(String password) throws UnsupportedEncodingException, NoSuchAlgorithmException {
-        return Hashcypher.authenticate(password, this.password);        
+        return Hashcypher.authenticate(password, this.password);
     }
-    
+
     @Override
     public int hashCode() {
         return name.hashCode();
