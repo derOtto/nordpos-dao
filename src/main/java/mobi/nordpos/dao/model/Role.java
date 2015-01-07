@@ -34,7 +34,7 @@ public class Role {
 
     @DatabaseField(columnName = NAME, unique = true)
     private String name;
-
+    
     public String getId() {
         return id;
     }
