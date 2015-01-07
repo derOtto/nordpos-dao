@@ -17,9 +17,7 @@
  */
 package mobi.nordpos.dao.model;
 
-import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.field.DatabaseField;
-import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
 
 /**
@@ -36,9 +34,6 @@ public class Role {
 
     @DatabaseField(columnName = NAME, unique = true)
     private String name;
-
-    @ForeignCollectionField(orderAscending = true, orderColumnName = User.NAME, eager = true)
-    private ForeignCollection<User> userCollection;
     
     public String getId() {
         return id;
@@ -54,10 +49,6 @@ public class Role {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public ForeignCollection<User> getUserCollection() {
-        return userCollection;
     }
      
    @Override

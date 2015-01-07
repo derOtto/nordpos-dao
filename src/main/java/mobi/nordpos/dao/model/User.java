@@ -58,9 +58,6 @@ public class User {
     @DatabaseField(columnName = VISIBLE, defaultValue = "true")
     private Boolean visible;
 
-    @DatabaseField(columnName = IMAGE, dataType = DataType.BYTE_ARRAY, canBeNull = true)
-    private byte[] image;
-
     public String getId() {
         return id;
     }
@@ -99,14 +96,6 @@ public class User {
 
     public void setVisible(Boolean visible) {
         this.visible = visible;
-    }
-
-    public byte[] getImage() {
-        return image;
-    }
-
-    public void setImage(byte[] image) {
-        this.image = image;
     }
 
     public String getPassword() {
