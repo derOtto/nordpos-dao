@@ -17,7 +17,6 @@
  */
 package mobi.nordpos.dao.model;
 
-import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import com.openbravo.pos.util.Hashcypher;

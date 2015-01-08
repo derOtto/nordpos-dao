@@ -17,7 +17,16 @@
  */
 package mobi.nordpos.dao.model;
 
+import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
+import com.openbravo.pos.util.Hashcypher;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
+import java.util.Properties;
+import java.util.UUID;
 
 /**
  * @author Andrey Svininykh <svininykh@gmail.com>
@@ -29,9 +38,12 @@ public class Customer {
     public static final String SEARCHKEY = "SEARCHKEY";
     public static final String TAXCATEGORY = "TAXCATEGORY";
     public static final String EMAIL = "EMAIL";
+    public static final String ATTRIBUTES = "ATTRIBUTES";
+    
+    private static String LOGIN_PASSWORD_KEY = "customer.login.password";
 
-    @DatabaseField(id = true, columnName = ID)
-    private String id;
+    @DatabaseField(generatedId = true, columnName = ID)
+    private UUID id;
 
     @DatabaseField(columnName = NAME, canBeNull = false)
     private String name;
@@ -46,14 +58,17 @@ public class Customer {
             canBeNull = true)
     private TaxCategory taxCategory;
 
-    @DatabaseField(columnName = EMAIL, canBeNull = false)
+    @DatabaseField(columnName = EMAIL, canBeNull = true)
     private String email;
 
-    public String getId() {
-        return ID;
+    @DatabaseField(columnName = ATTRIBUTES, dataType = DataType.BYTE_ARRAY)
+    byte[] attributes;
+
+    public UUID getId() {
+        return id;
     }
 
-    public void setId(String id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 
@@ -87,6 +102,55 @@ public class Customer {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public byte[] getAttributes() {
+        return attributes;
+    }
+
+    public void setAttributes(byte[] attributes) {
+        this.attributes = attributes;
+    }
+
+    public Properties getProperties() throws IOException {
+        Properties properties = new Properties();
+        if (this.attributes != null) {
+            properties.loadFromXML(new ByteArrayInputStream(this.attributes));
+        }
+        return properties;
+    }
+
+    public void setProperties(Properties properties) throws IOException {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        properties.storeToXML(outputStream, "Customer attributes", "UTF-8");
+        setAttributes(outputStream.toByteArray());
+    }
+
+    public String getPassword() throws IOException {
+        return getProperties().getProperty(LOGIN_PASSWORD_KEY);
+    }
+
+    public void setPassword(String password) throws UnsupportedEncodingException, NoSuchAlgorithmException, IOException {
+        Properties properties = getProperties();
+        properties.setProperty(LOGIN_PASSWORD_KEY, Hashcypher.hashString(password));
+        setProperties(properties);
+    }
+
+    public boolean isAuthentication(String password) throws UnsupportedEncodingException, NoSuchAlgorithmException, IOException {
+        return Hashcypher.authenticate(password, getPassword());
+    }
+
+    @Override
+    public int hashCode() {
+        return name.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (other == null || other.getClass() != getClass()) {
+            return false;
+        }
+        return name.equals(((Customer) other).name);
     }
 
 }

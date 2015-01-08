@@ -21,17 +21,18 @@ import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.support.ConnectionSource;
 import java.sql.SQLException;
-import mobi.nordpos.dao.model.User;
+import java.util.UUID;
+import mobi.nordpos.dao.model.Customer;
 
 /**
  * @author Andrey Svininykh <svininykh@gmail.com>
  */
-public class UserDao extends BaseDaoImpl<User, String> {
+public class CustomerDao extends BaseDaoImpl<Customer, UUID> {
 
-    Dao<User, String> userDao;
+    Dao<Customer, UUID> customerDao;
 
-    protected UserDao(ConnectionSource connectionSource) throws SQLException {
-        super(connectionSource, User.class);
+    protected CustomerDao(ConnectionSource connectionSource) throws SQLException {
+        super(connectionSource, Customer.class);
     }
 
 }
