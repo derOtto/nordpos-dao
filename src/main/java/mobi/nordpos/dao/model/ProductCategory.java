@@ -22,7 +22,9 @@ import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
+import java.io.IOException;
 import java.util.List;
+import mobi.nordpos.dao.util.ImagePreview;
 
 /**
  * @author Andrey Svininykh <svininykh@gmail.com>
@@ -99,6 +101,10 @@ public class ProductCategory {
 
     public int getProductListSize() {
         return productList.size();
+    }
+
+    public byte[] getImageThumbnail(int size) throws IOException {
+        return ImagePreview.createThumbnail(getImage(), size);
     }
 
     @Override

@@ -23,9 +23,9 @@ import com.j256.ormlite.table.DatabaseTable;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.util.Properties;
+import mobi.nordpos.dao.util.ImagePreview;
 
 /**
  * @author Andrey Svininykh <svininykh@gmail.com>
@@ -213,6 +213,10 @@ public class Product {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         properties.storeToXML(outputStream, "Product attributes", "UTF-8");
         setAttributes(outputStream.toByteArray());
+    }
+
+    public byte[] getImageThumbnail(int size) throws IOException {
+        return ImagePreview.createThumbnail(getImage(), size);
     }
 
     @Override
