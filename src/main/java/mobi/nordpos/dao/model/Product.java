@@ -1,6 +1,6 @@
 /**
  * Copyright (c) 2012-2015 Nord Trading Network.
- * 
+ *
  * http://www.nordpos.mobi
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -20,7 +20,12 @@ package mobi.nordpos.dao.model;
 import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.math.BigDecimal;
+import java.util.Properties;
 
 /**
  * @author Andrey Svininykh <svininykh@gmail.com>
@@ -38,6 +43,7 @@ public class Product {
     public static final String TAXCAT = "TAXCAT";
     public static final String IMAGE = "IMAGE";
     public static final String ISCOM = "ISCOM";
+    public static final String ATTRIBUTES = "ATTRIBUTES";
 
     @DatabaseField(id = true, columnName = ID)
     private String id;
@@ -59,9 +65,12 @@ public class Product {
 
     @DatabaseField(columnName = IMAGE, dataType = DataType.BYTE_ARRAY, canBeNull = true)
     private byte[] image;
-    
+
     @DatabaseField(columnName = ISCOM, defaultValue = "false")
     private Boolean com;
+
+    @DatabaseField(columnName = ATTRIBUTES, dataType = DataType.BYTE_ARRAY)
+    byte[] attributes;
 
     @DatabaseField(foreign = true,
             columnName = CATEGORY,
@@ -146,7 +155,7 @@ public class Product {
     public void setCom(Boolean com) {
         this.com = com;
     }
-    
+
     public BigDecimal getTaxPriceSell() {
         if (taxPriceSell != null) {
             return taxPriceSell;
@@ -183,7 +192,29 @@ public class Product {
     public void setTax(Tax tax) {
         this.tax = tax;
     }
-    
+
+    public byte[] getAttributes() {
+        return attributes;
+    }
+
+    public void setAttributes(byte[] attributes) {
+        this.attributes = attributes;
+    }
+
+    public Properties getProperties() throws IOException {
+        Properties properties = new Properties();
+        if (this.attributes != null) {
+            properties.loadFromXML(new ByteArrayInputStream(this.attributes));
+        }
+        return properties;
+    }
+
+    public void setProperties(Properties properties) throws IOException {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        properties.storeToXML(outputStream, "Product attributes", "UTF-8");
+        setAttributes(outputStream.toByteArray());
+    }
+
     @Override
     public int hashCode() {
         return name.hashCode();
