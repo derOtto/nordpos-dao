@@ -1,6 +1,6 @@
 /**
  * Copyright (c) 2012-2015 Nord Trading Network.
- * 
+ *
  * http://www.nordpos.mobi
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -20,6 +20,7 @@ package mobi.nordpos.dao.model;
 import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
+import com.openbravo.pos.ticket.TicketLineInfo;
 import java.math.BigDecimal;
 
 /**
@@ -46,7 +47,7 @@ public class SharedTicket {
 
     @DatabaseField(persisted = false)
     private BigDecimal totalUnit;
-    
+
     public String getId() {
         return id;
     }
@@ -72,21 +73,27 @@ public class SharedTicket {
     }
 
     public BigDecimal getTotalValue() {
+        totalValue = BigDecimal.ZERO;
+        if (content != null) {
+            BigDecimal unit = BigDecimal.ZERO;
+            for (TicketLineInfo line : content.getM_aLines()) {
+                totalValue = totalValue.add(BigDecimal.valueOf(line.getValue()));
+                unit = unit.add(BigDecimal.valueOf(line.getMultiply()));
+            }
+        }
         return totalValue;
     }
 
-    public void setTotalValue(BigDecimal totalValue) {
-        this.totalValue = totalValue;
-    }
-
     public BigDecimal getTotalUnit() {
+        totalUnit = BigDecimal.ZERO;
+        if (content != null) {
+            for (TicketLineInfo line : content.getM_aLines()) {
+                totalUnit = totalUnit.add(BigDecimal.valueOf(line.getMultiply()));
+            }
+        }
         return totalUnit;
     }
 
-    public void setTotalUnit(BigDecimal totalUnit) {
-        this.totalUnit = totalUnit;
-    }
-    
     @Override
     public int hashCode() {
         return name.hashCode();
