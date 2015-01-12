@@ -21,26 +21,27 @@ import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.support.ConnectionSource;
 import java.sql.SQLException;
 import java.util.List;
-import mobi.nordpos.dao.model.Application;
+import java.util.UUID;
+import mobi.nordpos.dao.model.ClosedCash;
 
 /**
  * @author Andrey Svininykh <svininykh@gmail.com>
  */
-public class ApplicationPersist implements PersistFactory {
+public class ClosedCashPersist implements PersistFactory {
 
     ConnectionSource connectionSource;
-    ApplicationDao applicationDao;
+    ClosedCashDao closedCashDao;
 
     @Override
     public void init(ConnectionSource connectionSource) throws SQLException {
         this.connectionSource = connectionSource;
-        applicationDao = new ApplicationDao(connectionSource);
+        closedCashDao = new ClosedCashDao(connectionSource);
     }
 
     @Override
-    public Application read(Object id) throws SQLException {
+    public ClosedCash read(Object id) throws SQLException {
         try {
-            return applicationDao.queryForId((String) id);
+            return closedCashDao.queryForId((UUID) id);
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -49,9 +50,9 @@ public class ApplicationPersist implements PersistFactory {
     }
 
     @Override
-    public List<Application> readList() throws SQLException {
+    public List<ClosedCash> readList() throws SQLException {
         try {
-            return applicationDao.queryForAll();
+            return closedCashDao.queryForAll();
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -60,11 +61,11 @@ public class ApplicationPersist implements PersistFactory {
     }
 
     @Override
-    public Application find(String column, Object value) throws SQLException {
+    public ClosedCash find(String column, Object value) throws SQLException {
         try {
-            QueryBuilder qb = applicationDao.queryBuilder();
+            QueryBuilder qb = closedCashDao.queryBuilder();
             qb.where().like(column, value);
-            return (Application) qb.queryForFirst();
+            return (ClosedCash) qb.queryForFirst();
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -73,9 +74,9 @@ public class ApplicationPersist implements PersistFactory {
     }
 
     @Override
-    public Application add(Object application) throws SQLException {
+    public ClosedCash add(Object closedCash) throws SQLException {
         try {
-            return applicationDao.createIfNotExists((Application) application);
+            return closedCashDao.createIfNotExists((ClosedCash) closedCash);
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -84,9 +85,9 @@ public class ApplicationPersist implements PersistFactory {
     }
 
     @Override
-    public Boolean change(Object application) throws SQLException {
+    public Boolean change(Object closedCash) throws SQLException {
         try {
-            return applicationDao.update((Application) application) > 0;
+            return closedCashDao.update((ClosedCash) closedCash) > 0;
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -97,11 +98,18 @@ public class ApplicationPersist implements PersistFactory {
     @Override
     public Boolean delete(Object id) throws SQLException {
         try {
-            return applicationDao.deleteById((String) id) > 0;
+            return closedCashDao.deleteById((UUID) id) > 0;
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
             }
         }
+    }
+
+    public ClosedCash readOpen(String hostName) throws SQLException {
+        QueryBuilder qb = closedCashDao.queryBuilder();
+        qb.where().eq(ClosedCash.HOST, hostName).and().isNull(ClosedCash.DATEEND);
+//        qb.orderBy(ClosedCash.HOSTSEQUENCE, false);
+        return (ClosedCash) qb.queryForFirst();
     }
 }
