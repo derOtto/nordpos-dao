@@ -22,6 +22,7 @@ import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import com.openbravo.pos.ticket.TicketLineInfo;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 /**
  * @author Andrey Svininykh <svininykh@gmail.com>
@@ -81,7 +82,7 @@ public class SharedTicket {
                 unit = unit.add(BigDecimal.valueOf(line.getMultiply()));
             }
         }
-        return totalValue;
+        return totalValue.setScale(2, RoundingMode.HALF_DOWN);
     }
 
     public BigDecimal getTotalUnit() {
