@@ -1,6 +1,6 @@
 /**
  * Copyright (c) 2012-2015 Nord Trading Network.
- * 
+ *
  * http://www.nordpos.mobi
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -48,9 +48,6 @@ public class Receipt {
     @DatabaseField(columnName = ATTRIBUTES, dataType = DataType.SERIALIZABLE)
     byte[] attributes;
 
-    @DatabaseField(persisted = false)
-    Ticket ticket;
-
     @ForeignCollectionField
     ForeignCollection<Payment> paymentCollection;
 
@@ -83,14 +80,6 @@ public class Receipt {
 
     public void setAttributes(byte[] attributes) {
         this.attributes = attributes;
-    }
-
-    public Ticket getTicket() {
-        return ticket;
-    }
-
-    public void setTicket(Ticket ticket) {
-        this.ticket = ticket;
     }
 
     public ForeignCollection<Payment> getPaymentCollection() {

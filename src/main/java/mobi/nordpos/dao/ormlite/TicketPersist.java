@@ -22,26 +22,26 @@ import com.j256.ormlite.support.ConnectionSource;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
-import mobi.nordpos.dao.model.Receipt;
+import mobi.nordpos.dao.model.Ticket;
 
 /**
  * @author Andrey Svininykh <svininykh@gmail.com>
  */
-public class ReceiptPersist implements PersistFactory {
+public class TicketPersist implements PersistFactory {
 
     ConnectionSource connectionSource;
-    ReceiptDao receiptDao;
+    TicketDao ticketDao;
 
     @Override
     public void init(ConnectionSource connectionSource) throws SQLException {
         this.connectionSource = connectionSource;
-        receiptDao = new ReceiptDao(connectionSource);
+        ticketDao = new TicketDao(connectionSource);
     }
 
     @Override
-    public Receipt read(Object id) throws SQLException {
+    public Ticket read(Object id) throws SQLException {
         try {
-            return receiptDao.queryForId((UUID) id);
+            return ticketDao.queryForId((UUID) id);
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -50,9 +50,9 @@ public class ReceiptPersist implements PersistFactory {
     }
 
     @Override
-    public List<Receipt> readList() throws SQLException {
+    public List<Ticket> readList() throws SQLException {
         try {
-            return receiptDao.queryForAll();
+            return ticketDao.queryForAll();
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -61,11 +61,11 @@ public class ReceiptPersist implements PersistFactory {
     }
 
     @Override
-    public Receipt find(String column, Object value) throws SQLException {
+    public Ticket find(String column, Object value) throws SQLException {
         try {
-            QueryBuilder qb = receiptDao.queryBuilder();
+            QueryBuilder qb = ticketDao.queryBuilder();
             qb.where().like(column, value);
-            return (Receipt) qb.queryForFirst();
+            return (Ticket) qb.queryForFirst();
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -74,9 +74,9 @@ public class ReceiptPersist implements PersistFactory {
     }
 
     @Override
-    public Receipt add(Object receipt) throws SQLException {
+    public Ticket add(Object ticket) throws SQLException {
         try {
-            return receiptDao.createIfNotExists((Receipt) receipt);
+            return ticketDao.createIfNotExists((Ticket) ticket);
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -85,9 +85,9 @@ public class ReceiptPersist implements PersistFactory {
     }
 
     @Override
-    public Boolean change(Object receipt) throws SQLException {
+    public Boolean change(Object ticket) throws SQLException {
         try {
-            return receiptDao.update((Receipt) receipt) > 0;
+            return ticketDao.update((Ticket) ticket) > 0;
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -98,7 +98,7 @@ public class ReceiptPersist implements PersistFactory {
     @Override
     public Boolean delete(Object id) throws SQLException {
         try {
-            return receiptDao.deleteById((UUID) id) > 0;
+            return ticketDao.deleteById((UUID) id) > 0;
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
