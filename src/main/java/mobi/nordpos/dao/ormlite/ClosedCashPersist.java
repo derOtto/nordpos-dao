@@ -107,9 +107,14 @@ public class ClosedCashPersist implements PersistFactory {
     }
 
     public ClosedCash readOpen(String hostName) throws SQLException {
-        QueryBuilder qb = closedCashDao.queryBuilder();
-        qb.where().eq(ClosedCash.HOST, hostName).and().isNull(ClosedCash.DATEEND);
-//        qb.orderBy(ClosedCash.HOSTSEQUENCE, false);
-        return (ClosedCash) qb.queryForFirst();
+        try {
+            QueryBuilder qb = closedCashDao.queryBuilder();
+            qb.where().eq(ClosedCash.HOST, hostName).and().isNull(ClosedCash.DATEEND);
+            return (ClosedCash) qb.queryForFirst();
+        } finally {
+            if (connectionSource != null) {
+                connectionSource.close();
+            }
+        }
     }
 }
