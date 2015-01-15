@@ -39,7 +39,7 @@ public class Receipt {
     @DatabaseField(generatedId = true, columnName = ID)
     private UUID id;
 
-    @DatabaseField(foreign = true, foreignAutoRefresh = true, foreignColumnName = "MONEY", columnName = MONEY, canBeNull = false, index = true, indexName = "RECEIPTS_MONEY_INX")
+    @DatabaseField(foreign = true, foreignAutoRefresh = true, foreignColumnName = ClosedCash.MONEY, columnName = MONEY, canBeNull = false, index = true, indexName = "RECEIPTS_MONEY_INX")
     private ClosedCash closedCash;
 
     @DatabaseField(columnName = DATENEW, canBeNull = false, index = true, indexName = "RECEIPTS_INX_1")

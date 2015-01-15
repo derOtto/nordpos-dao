@@ -17,35 +17,36 @@
  */
 package mobi.nordpos.dao.factory;
 
-import com.j256.ormlite.dao.CloseableWrappedIterable;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.support.ConnectionSource;
+import java.math.BigDecimal;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import mobi.nordpos.dao.model.Ticket;
+import mobi.nordpos.dao.model.Location;
+import mobi.nordpos.dao.model.Receipt;
+import mobi.nordpos.dao.model.StockDiary;
 import mobi.nordpos.dao.model.TicketLine;
-import mobi.nordpos.dao.ormlite.TicketDao;
+import mobi.nordpos.dao.ormlite.StockDiaryDao;
 
 /**
  * @author Andrey Svininykh <svininykh@gmail.com>
  */
-public class TicketPersist implements PersistFactory {
+public class StockDiaryPersist implements PersistFactory {
 
     ConnectionSource connectionSource;
-    TicketDao ticketDao;
+    StockDiaryDao stockDiaryDao;
 
     @Override
     public void init(ConnectionSource connectionSource) throws SQLException {
         this.connectionSource = connectionSource;
-        ticketDao = new TicketDao(connectionSource);
+        stockDiaryDao = new StockDiaryDao(connectionSource);
     }
 
     @Override
-    public Ticket read(Object id) throws SQLException {
+    public StockDiary read(Object id) throws SQLException {
         try {
-            return ticketDao.queryForId((UUID) id);
+            return stockDiaryDao.queryForId((UUID) id);
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -54,9 +55,9 @@ public class TicketPersist implements PersistFactory {
     }
 
     @Override
-    public List<Ticket> readList() throws SQLException {
+    public List<StockDiary> readList() throws SQLException {
         try {
-            return ticketDao.queryForAll();
+            return stockDiaryDao.queryForAll();
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -65,11 +66,11 @@ public class TicketPersist implements PersistFactory {
     }
 
     @Override
-    public Ticket find(String column, Object value) throws SQLException {
+    public StockDiary find(String column, Object value) throws SQLException {
         try {
-            QueryBuilder qb = ticketDao.queryBuilder();
+            QueryBuilder qb = stockDiaryDao.queryBuilder();
             qb.where().like(column, value);
-            return (Ticket) qb.queryForFirst();
+            return (StockDiary) qb.queryForFirst();
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -78,9 +79,9 @@ public class TicketPersist implements PersistFactory {
     }
 
     @Override
-    public Ticket add(Object ticket) throws SQLException {
+    public StockDiary add(Object stockDiary) throws SQLException {
         try {
-            return ticketDao.createIfNotExists((Ticket) ticket);
+            return stockDiaryDao.createIfNotExists((StockDiary) stockDiary);
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -89,9 +90,9 @@ public class TicketPersist implements PersistFactory {
     }
 
     @Override
-    public Boolean change(Object ticket) throws SQLException {
+    public Boolean change(Object stockDiary) throws SQLException {
         try {
-            return ticketDao.update((Ticket) ticket) > 0;
+            return stockDiaryDao.update((StockDiary) stockDiary) > 0;
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -102,7 +103,7 @@ public class TicketPersist implements PersistFactory {
     @Override
     public Boolean delete(Object id) throws SQLException {
         try {
-            return ticketDao.deleteById((UUID) id) > 0;
+            return stockDiaryDao.deleteById((UUID) id) > 0;
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -110,16 +111,30 @@ public class TicketPersist implements PersistFactory {
         }
     }
 
-    public List<TicketLine> readTicketLineList(Ticket ticket) throws SQLException {
-        CloseableWrappedIterable<TicketLine> iterator = ticket.getTicketLineCollection().getWrappedIterable();
-        List<TicketLine> list = new ArrayList<>();
+    public Integer addStockDiaryList(Integer reason, Location location, Receipt receipt, List<TicketLine> lineList) throws SQLException {
         try {
-            for (TicketLine line : iterator) {
-                list.add(line);
+            Integer counter = 0;
+            for (TicketLine line : lineList) {
+                StockDiary diary = new StockDiary();
+                diary.setReason(reason);
+                diary.setLocation(location);
+                diary.setDate(receipt.getDate());
+                diary.setProduct(line.getProduct());
+                diary.setPrice(line.getPrice());
+
+                if (reason >= 0) {
+                    diary.setUnit(line.getUnit());
+                } else {
+                    diary.setUnit(line.getUnit().negate());
+                }
+                
+                counter = counter + stockDiaryDao.create(diary);
             }
-            return list;
+            return counter;
         } finally {
-            iterator.close();
+            if (connectionSource != null) {
+                connectionSource.close();
+            }
         }
     }
 

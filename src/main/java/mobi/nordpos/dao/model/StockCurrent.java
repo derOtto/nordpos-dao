@@ -20,63 +20,37 @@ package mobi.nordpos.dao.model;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 
 /**
  * @author Andrey Svininykh <svininykh@gmail.com>
  */
-@DatabaseTable(tableName = "TICKETLINES")
-public class TicketLine {
+@DatabaseTable(tableName = "STOCKCURRENT")
+public class StockCurrent {
 
-    public static final String TICKET = "TICKET";
-    public static final String LINE = "LINE";
+    public static final String LOCATION = "LOCATION";
     public static final String PRODUCT = "PRODUCT";
     public static final String ATTRIBUTESETINSTANCE_ID = "ATTRIBUTESETINSTANCE_ID";
     public static final String UNITS = "UNITS";
-    public static final String PRICE = "PRICE";
-    public static final String TAXID = "TAXID";
-    public static final String ATTRIBUTES = "ATTRIBUTES";
     public static final String ID = "ID";
 
     @DatabaseField(id = true, useGetSet = true, columnName = ID)
     private String id;
 
-    @DatabaseField(columnName = LINE, canBeNull = false)
-    private Integer number;
-
     @DatabaseField(columnName = UNITS, canBeNull = false)
     private BigDecimal unit;
 
-    @DatabaseField(columnName = PRICE, canBeNull = false)
-    private BigDecimal price;
-
-    @DatabaseField(foreign = true, foreignAutoRefresh = true, columnName = TAXID, canBeNull = false)
-    private Tax tax;
-
-    @DatabaseField(foreign = true, foreignAutoRefresh = true, columnName = TICKET, canBeNull = false)
-    private Ticket ticket;
+    @DatabaseField(foreign = true, foreignAutoRefresh = true, columnName = LOCATION, canBeNull = false)
+    private Location location;
 
     @DatabaseField(foreign = true, foreignAutoRefresh = true, maxForeignAutoRefreshLevel = 1, columnName = PRODUCT, canBeNull = true)
     private Product product;
 
     public String getId() {
-        if (ticket == null) {
-            return number.toString();
-        } else {
-            return ticket.getId().toString() + "-" + number.toString();
-        }
+        return location.getId() + "-" + product.getId();
     }
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public Integer getNumber() {
-        return number;
-    }
-
-    public void setNumber(Integer number) {
-        this.number = number;
     }
 
     public BigDecimal getUnit() {
@@ -87,28 +61,12 @@ public class TicketLine {
         this.unit = unit;
     }
 
-    public BigDecimal getPrice() {
-        return price;
+    public Location getLocation() {
+        return location;
     }
 
-    public void setPrice(BigDecimal price) {
-        this.price = price;
-    }
-
-    public Tax getTax() {
-        return tax;
-    }
-
-    public void setTax(Tax tax) {
-        this.tax = tax;
-    }
-
-    public Ticket getTicket() {
-        return ticket;
-    }
-
-    public void setTicket(Ticket ticket) {
-        this.ticket = ticket;
+    public void setLocation(Location location) {
+        this.location = location;
     }
 
     public Product getProduct() {
@@ -125,7 +83,7 @@ public class TicketLine {
             return false;
         }
         try {
-            return id.equals(((TicketLine) other).id);
+            return id.equals(((StockCurrent) other).id);
         } catch (Exception e) {
             return false;
         }

@@ -31,14 +31,14 @@ public class Payment {
     public enum PaymentType {
 
         CASH("cash"), CARD("magcard"), CARD_REFUND("magcardrefund"), CHANGE("change"), UNKNOWN("unknown"), FREE("free");
-        private final String type;
+        private final String key;
 
-        private PaymentType(String type) {
-            this.type = type;
+        private PaymentType(String key) {
+            this.key = key;
         }
 
-        public String getPaymentType() {
-            return type;
+        public String getKey() {
+            return key;
         }
     }
 

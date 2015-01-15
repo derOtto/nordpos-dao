@@ -38,7 +38,7 @@ public final class Ticket {
             this.code = code;
         }
 
-        public int getTicketType() {
+        public int getCode() {
             return code;
         }
     }
@@ -64,8 +64,8 @@ public final class Ticket {
 
     @DatabaseField(foreign = true, foreignAutoRefresh = true, foreignColumnName = Customer.ID, columnName = CUSTOMER, canBeNull = true)
     private Customer customer;
-
-    @ForeignCollectionField
+    
+    @ForeignCollectionField(orderAscending = true, orderColumnName = TicketLine.ID, eager = true)
     private ForeignCollection<TicketLine> ticketLineCollection;
 
     public UUID getId() {

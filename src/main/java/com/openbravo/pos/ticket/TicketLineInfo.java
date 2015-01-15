@@ -16,7 +16,6 @@
 //
 //    You should have received a copy of the GNU General Public License
 //    along with Openbravo POS.  If not, see <http://www.gnu.org/licenses/>.
-
 package com.openbravo.pos.ticket;
 
 import java.io.Serializable;
@@ -59,7 +58,7 @@ public class TicketLineInfo implements Serializable {
         attributes.setProperty("product.com", product.isCom() ? "true" : "false");
         attributes.setProperty("product.taxcategoryid", product.getTaxcat());
         if (product.getCategoryId() != null) {
-             attributes.setProperty("product.categoryid", product.getCategoryId());
+            attributes.setProperty("product.categoryid", product.getCategoryId());
         }
     }
 
@@ -96,15 +95,19 @@ public class TicketLineInfo implements Serializable {
     }
 
     public double getPrice() {
-        try {
-            return price +(price * getTax().getRate());
-        } catch (NullPointerException ex){
-            return price;
-        }
+        return price;
     }
 
     public void setPrice(double price) {
         this.price = price;
+    }
+
+    public double getTotalPrice() {
+        try {
+            return price + (price * getTax().getRate());
+        } catch (NullPointerException ex) {
+            return price;
+        }
     }
 
     public String getProductid() {
@@ -127,14 +130,13 @@ public class TicketLineInfo implements Serializable {
         return price * multiply;
     }
 
-
     public void setTicket(String ticket, int size) {
         m_sTicket = ticket;
         m_iLine = size;
     }
 
     public double getValue() {
-        return getPrice() * multiply;
+        return getTotalPrice() * multiply;
     }
 
     public String getProductTaxCategoryID() {
