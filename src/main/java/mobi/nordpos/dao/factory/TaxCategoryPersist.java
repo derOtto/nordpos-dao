@@ -15,35 +15,33 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package mobi.nordpos.dao.ormlite;
+package mobi.nordpos.dao.factory;
 
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.support.ConnectionSource;
-import com.openbravo.pos.sales.TaxesLogic;
 import java.sql.SQLException;
-import java.util.Date;
 import java.util.List;
-import mobi.nordpos.dao.model.Tax;
+import mobi.nordpos.dao.model.TaxCategory;
+import mobi.nordpos.dao.ormlite.TaxCategoryDao;
 
 /**
  * @author Andrey Svininykh <svininykh@gmail.com>
  */
-public class TaxPersist implements PersistFactory {
+public class TaxCategoryPersist implements PersistFactory {
 
     ConnectionSource connectionSource;
-    TaxDao taxDao;
+    TaxCategoryDao taxCategoryDao;
 
     @Override
     public void init(ConnectionSource connectionSource) throws SQLException {
         this.connectionSource = connectionSource;
-        taxDao = new TaxDao(connectionSource);
+        taxCategoryDao = new TaxCategoryDao(connectionSource);
     }
 
     @Override
-    public Tax read(Object taxCategoryId) throws SQLException {
+    public TaxCategory read(Object id) throws SQLException {
         try {
-            TaxesLogic taxLogic = new TaxesLogic(taxDao.queryForAll());
-            return taxLogic.getTax((String) taxCategoryId, new Date());
+            return taxCategoryDao.queryForId((String) id);
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -52,9 +50,9 @@ public class TaxPersist implements PersistFactory {
     }
 
     @Override
-    public List<Tax> readList() throws SQLException {
+    public List<TaxCategory> readList() throws SQLException {
         try {
-            return taxDao.queryForAll();
+            return taxCategoryDao.queryForAll();
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -63,11 +61,11 @@ public class TaxPersist implements PersistFactory {
     }
 
     @Override
-    public Tax find(String column, Object value) throws SQLException {
+    public TaxCategory find(String column, Object value) throws SQLException {
         try {
-            QueryBuilder qb = taxDao.queryBuilder();
+            QueryBuilder qb = taxCategoryDao.queryBuilder();
             qb.where().like(column, value);
-            return (Tax) qb.queryForFirst();
+            return (TaxCategory) qb.queryForFirst();
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -76,9 +74,9 @@ public class TaxPersist implements PersistFactory {
     }
 
     @Override
-    public Tax add(Object tax) throws SQLException {
+    public TaxCategory add(Object taxCategory) throws SQLException {
         try {
-            return taxDao.createIfNotExists((Tax) tax);
+            return taxCategoryDao.createIfNotExists((TaxCategory) taxCategory);
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -87,9 +85,9 @@ public class TaxPersist implements PersistFactory {
     }
 
     @Override
-    public Boolean change(Object tax) throws SQLException {
+    public Boolean change(Object taxCategory) throws SQLException {
         try {
-            return taxDao.update((Tax) tax) > 0;
+            return taxCategoryDao.update((TaxCategory) taxCategory) > 0;
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -100,11 +98,12 @@ public class TaxPersist implements PersistFactory {
     @Override
     public Boolean delete(Object id) throws SQLException {
         try {
-            return taxDao.deleteById((String) id) > 0;
+            return taxCategoryDao.deleteById((String) id) > 0;
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
             }
         }
     }
+
 }

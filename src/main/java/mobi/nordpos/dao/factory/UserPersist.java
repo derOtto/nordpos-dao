@@ -15,33 +15,33 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package mobi.nordpos.dao.ormlite;
+package mobi.nordpos.dao.factory;
 
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.support.ConnectionSource;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.UUID;
-import mobi.nordpos.dao.model.Ticket;
+import mobi.nordpos.dao.model.User;
+import mobi.nordpos.dao.ormlite.UserDao;
 
 /**
  * @author Andrey Svininykh <svininykh@gmail.com>
  */
-public class TicketPersist implements PersistFactory {
+public class UserPersist implements PersistFactory {
 
     ConnectionSource connectionSource;
-    TicketDao ticketDao;
+    UserDao userDao;
 
     @Override
     public void init(ConnectionSource connectionSource) throws SQLException {
         this.connectionSource = connectionSource;
-        ticketDao = new TicketDao(connectionSource);
+        userDao = new UserDao(connectionSource);
     }
 
     @Override
-    public Ticket read(Object id) throws SQLException {
+    public User read(Object id) throws SQLException {
         try {
-            return ticketDao.queryForId((UUID) id);
+            return userDao.queryForId((String) id);
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -50,9 +50,11 @@ public class TicketPersist implements PersistFactory {
     }
 
     @Override
-    public List<Ticket> readList() throws SQLException {
+    public List<User> readList() throws SQLException {
         try {
-            return ticketDao.queryForAll();
+            QueryBuilder qb = userDao.queryBuilder().orderBy(User.NAME, true);
+            qb.where().isNotNull(User.ID);
+            return qb.query();
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -61,11 +63,11 @@ public class TicketPersist implements PersistFactory {
     }
 
     @Override
-    public Ticket find(String column, Object value) throws SQLException {
+    public User find(String column, Object value) throws SQLException {
         try {
-            QueryBuilder qb = ticketDao.queryBuilder();
+            QueryBuilder qb = userDao.queryBuilder();
             qb.where().like(column, value);
-            return (Ticket) qb.queryForFirst();
+            return (User) qb.queryForFirst();
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -74,9 +76,9 @@ public class TicketPersist implements PersistFactory {
     }
 
     @Override
-    public Ticket add(Object ticket) throws SQLException {
+    public User add(Object user) throws SQLException {
         try {
-            return ticketDao.createIfNotExists((Ticket) ticket);
+            return userDao.createIfNotExists((User) user);
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -85,9 +87,9 @@ public class TicketPersist implements PersistFactory {
     }
 
     @Override
-    public Boolean change(Object ticket) throws SQLException {
+    public Boolean change(Object user) throws SQLException {
         try {
-            return ticketDao.update((Ticket) ticket) > 0;
+            return userDao.update((User) user) > 0;
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -98,12 +100,11 @@ public class TicketPersist implements PersistFactory {
     @Override
     public Boolean delete(Object id) throws SQLException {
         try {
-            return ticketDao.deleteById((UUID) id) > 0;
+            return userDao.deleteById((String) id) > 0;
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
             }
         }
     }
-
 }

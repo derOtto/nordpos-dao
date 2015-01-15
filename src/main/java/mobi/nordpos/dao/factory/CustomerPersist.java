@@ -15,32 +15,34 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package mobi.nordpos.dao.ormlite;
+package mobi.nordpos.dao.factory;
 
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.support.ConnectionSource;
 import java.sql.SQLException;
 import java.util.List;
-import mobi.nordpos.dao.model.Place;
+import java.util.UUID;
+import mobi.nordpos.dao.model.Customer;
+import mobi.nordpos.dao.ormlite.CustomerDao;
 
 /**
  * @author Andrey Svininykh <svininykh@gmail.com>
  */
-public class PlacePersist implements PersistFactory {
+public class CustomerPersist implements PersistFactory {
 
     ConnectionSource connectionSource;
-    PlaceDao placeDao;
+    CustomerDao customerDao;
 
     @Override
     public void init(ConnectionSource connectionSource) throws SQLException {
         this.connectionSource = connectionSource;
-        placeDao = new PlaceDao(connectionSource);
+        customerDao = new CustomerDao(connectionSource);
     }
 
     @Override
-    public Place read(Object id) throws SQLException {
+    public Customer read(Object id) throws SQLException {
         try {
-            return placeDao.queryForId((String) id);
+            return customerDao.queryForId((UUID) id);
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -49,10 +51,10 @@ public class PlacePersist implements PersistFactory {
     }
 
     @Override
-    public List<Place> readList() throws SQLException {
+    public List<Customer> readList() throws SQLException {
         try {
-            QueryBuilder qb = placeDao.queryBuilder().orderBy(Place.NAME, true);
-            qb.where().isNotNull(Place.ID);
+            QueryBuilder qb = customerDao.queryBuilder().orderBy(Customer.NAME, true);
+            qb.where().isNotNull(Customer.ID);
             return qb.query();
         } finally {
             if (connectionSource != null) {
@@ -62,11 +64,11 @@ public class PlacePersist implements PersistFactory {
     }
 
     @Override
-    public Place find(String column, Object value) throws SQLException {
+    public Customer find(String column, Object value) throws SQLException {
         try {
-            QueryBuilder qb = placeDao.queryBuilder();
+            QueryBuilder qb = customerDao.queryBuilder();
             qb.where().like(column, value);
-            return (Place) qb.queryForFirst();
+            return (Customer) qb.queryForFirst();
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -75,9 +77,9 @@ public class PlacePersist implements PersistFactory {
     }
 
     @Override
-    public Place add(Object place) throws SQLException {
+    public Customer add(Object customer) throws SQLException {
         try {
-            return placeDao.createIfNotExists((Place) place);
+            return customerDao.createIfNotExists((Customer) customer);
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -86,9 +88,9 @@ public class PlacePersist implements PersistFactory {
     }
 
     @Override
-    public Boolean change(Object place) throws SQLException {
+    public Boolean change(Object customer) throws SQLException {
         try {
-            return placeDao.update((Place) place) > 0;
+            return customerDao.update((Customer) customer) > 0;
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -99,12 +101,11 @@ public class PlacePersist implements PersistFactory {
     @Override
     public Boolean delete(Object id) throws SQLException {
         try {
-            return placeDao.deleteById((String) id) > 0;
+            return customerDao.deleteById((UUID) id) > 0;
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
             }
         }
     }
-
 }

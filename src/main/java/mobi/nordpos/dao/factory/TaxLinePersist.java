@@ -15,7 +15,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package mobi.nordpos.dao.ormlite;
+package mobi.nordpos.dao.factory;
 
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.support.ConnectionSource;
@@ -34,6 +34,7 @@ import mobi.nordpos.dao.model.Receipt;
 import mobi.nordpos.dao.model.SharedTicket;
 import mobi.nordpos.dao.model.Tax;
 import mobi.nordpos.dao.model.TaxLine;
+import mobi.nordpos.dao.ormlite.TaxLineDao;
 
 /**
  * @author Andrey Svininykh <svininykh@gmail.com>

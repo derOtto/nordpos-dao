@@ -15,57 +15,73 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package mobi.nordpos.dao.ormlite;
+package mobi.nordpos.dao.factory;
 
+import com.j256.ormlite.dao.CloseableWrappedIterable;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.support.ConnectionSource;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
-import mobi.nordpos.dao.model.Receipt;
+import mobi.nordpos.dao.model.Product;
+import mobi.nordpos.dao.model.ProductCategory;
+import mobi.nordpos.dao.ormlite.ProductCategoryDao;
 
 /**
  * @author Andrey Svininykh <svininykh@gmail.com>
  */
-public class ReceiptPersist implements PersistFactory {
+public class ProductCategoryPersist implements PersistFactory {
 
     ConnectionSource connectionSource;
-    ReceiptDao receiptDao;
-
+    ProductCategoryDao productCategoryDao;
+    
     @Override
     public void init(ConnectionSource connectionSource) throws SQLException {
         this.connectionSource = connectionSource;
-        receiptDao = new ReceiptDao(connectionSource);
+        productCategoryDao = new ProductCategoryDao(connectionSource);
     }
 
     @Override
-    public Receipt read(Object id) throws SQLException {
+    public ProductCategory read(Object id) throws SQLException {
         try {
-            return receiptDao.queryForId((UUID) id);
-        } finally {
+            return productCategoryDao.queryForId((String) id);
+        } finally {            
             if (connectionSource != null) {
                 connectionSource.close();
             }
         }
     }
-
+    
     @Override
-    public List<Receipt> readList() throws SQLException {
+    public List<ProductCategory> readList() throws SQLException {
         try {
-            return receiptDao.queryForAll();
+            QueryBuilder qb = productCategoryDao.queryBuilder().orderBy(ProductCategory.NAME, true);
+            qb.where().isNotNull(ProductCategory.ID);
+            return qb.query();
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
             }
         }
-    }
+    } 
 
     @Override
-    public Receipt find(String column, Object value) throws SQLException {
+    public ProductCategory find(String column, Object value) throws SQLException {
         try {
-            QueryBuilder qb = receiptDao.queryBuilder();
+            QueryBuilder qb = productCategoryDao.queryBuilder();
             qb.where().like(column, value);
-            return (Receipt) qb.queryForFirst();
+            return (ProductCategory) qb.queryForFirst();
+        } finally {
+            if (connectionSource != null) {
+                connectionSource.close();
+            }
+        }
+    }
+    
+    @Override
+    public ProductCategory add(Object category) throws SQLException {
+        try {
+            return productCategoryDao.createIfNotExists((ProductCategory) category);
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -74,20 +90,9 @@ public class ReceiptPersist implements PersistFactory {
     }
 
     @Override
-    public Receipt add(Object receipt) throws SQLException {
+    public Boolean change(Object category) throws SQLException {
         try {
-            return receiptDao.createIfNotExists((Receipt) receipt);
-        } finally {
-            if (connectionSource != null) {
-                connectionSource.close();
-            }
-        }
-    }
-
-    @Override
-    public Boolean change(Object receipt) throws SQLException {
-        try {
-            return receiptDao.update((Receipt) receipt) > 0;
+            return productCategoryDao.update((ProductCategory) category) > 0;
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -98,7 +103,7 @@ public class ReceiptPersist implements PersistFactory {
     @Override
     public Boolean delete(Object id) throws SQLException {
         try {
-            return receiptDao.deleteById((UUID) id) > 0;
+            return productCategoryDao.deleteById((String) id) > 0;
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -106,4 +111,16 @@ public class ReceiptPersist implements PersistFactory {
         }
     }
 
+    public List<Product> readProductList(ProductCategory category) throws SQLException {
+        CloseableWrappedIterable<Product> iterator = category.getProductCollection().getWrappedIterable();
+        List<Product> list = new ArrayList<>();
+        try {
+            for (Product product : iterator) {
+                list.add(product);
+            }
+            return list;
+        } finally {
+            iterator.close();
+        }
+    }
 }

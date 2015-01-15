@@ -31,7 +31,7 @@ public class CustomerDao extends BaseDaoImpl<Customer, UUID> {
 
     Dao<Customer, UUID> customerDao;
 
-    protected CustomerDao(ConnectionSource connectionSource) throws SQLException {
+    public CustomerDao(ConnectionSource connectionSource) throws SQLException {
         super(connectionSource, Customer.class);
     }
 

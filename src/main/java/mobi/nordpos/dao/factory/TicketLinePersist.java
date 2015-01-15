@@ -15,33 +15,39 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package mobi.nordpos.dao.ormlite;
+package mobi.nordpos.dao.factory;
 
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.support.ConnectionSource;
+import com.openbravo.pos.ticket.TicketLineInfo;
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.UUID;
-import mobi.nordpos.dao.model.ClosedCash;
+import mobi.nordpos.dao.model.Product;
+import mobi.nordpos.dao.model.SharedTicket;
+import mobi.nordpos.dao.model.Tax;
+import mobi.nordpos.dao.model.Ticket;
+import mobi.nordpos.dao.model.TicketLine;
+import mobi.nordpos.dao.ormlite.TicketLineDao;
 
 /**
  * @author Andrey Svininykh <svininykh@gmail.com>
  */
-public class ClosedCashPersist implements PersistFactory {
+public class TicketLinePersist implements PersistFactory {
 
     ConnectionSource connectionSource;
-    ClosedCashDao closedCashDao;
+    TicketLineDao ticketLineDao;
 
     @Override
     public void init(ConnectionSource connectionSource) throws SQLException {
         this.connectionSource = connectionSource;
-        closedCashDao = new ClosedCashDao(connectionSource);
+        ticketLineDao = new TicketLineDao(connectionSource);
     }
 
     @Override
-    public ClosedCash read(Object id) throws SQLException {
+    public TicketLine read(Object id) throws SQLException {
         try {
-            return closedCashDao.queryForId((UUID) id);
+            return ticketLineDao.queryForId((String) id);
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -50,9 +56,9 @@ public class ClosedCashPersist implements PersistFactory {
     }
 
     @Override
-    public List<ClosedCash> readList() throws SQLException {
+    public List<TicketLine> readList() throws SQLException {
         try {
-            return closedCashDao.queryForAll();
+            return ticketLineDao.queryForAll();
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -61,11 +67,11 @@ public class ClosedCashPersist implements PersistFactory {
     }
 
     @Override
-    public ClosedCash find(String column, Object value) throws SQLException {
+    public TicketLine find(String column, Object value) throws SQLException {
         try {
-            QueryBuilder qb = closedCashDao.queryBuilder();
+            QueryBuilder qb = ticketLineDao.queryBuilder();
             qb.where().like(column, value);
-            return (ClosedCash) qb.queryForFirst();
+            return (TicketLine) qb.queryForFirst();
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -74,9 +80,9 @@ public class ClosedCashPersist implements PersistFactory {
     }
 
     @Override
-    public ClosedCash add(Object closedCash) throws SQLException {
+    public TicketLine add(Object application) throws SQLException {
         try {
-            return closedCashDao.createIfNotExists((ClosedCash) closedCash);
+            return ticketLineDao.createIfNotExists((TicketLine) application);
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -85,9 +91,9 @@ public class ClosedCashPersist implements PersistFactory {
     }
 
     @Override
-    public Boolean change(Object closedCash) throws SQLException {
+    public Boolean change(Object application) throws SQLException {
         try {
-            return closedCashDao.update((ClosedCash) closedCash) > 0;
+            return ticketLineDao.update((TicketLine) application) > 0;
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -98,7 +104,7 @@ public class ClosedCashPersist implements PersistFactory {
     @Override
     public Boolean delete(Object id) throws SQLException {
         try {
-            return closedCashDao.deleteById((UUID) id) > 0;
+            return ticketLineDao.deleteById((String) id) > 0;
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -106,11 +112,27 @@ public class ClosedCashPersist implements PersistFactory {
         }
     }
 
-    public ClosedCash readOpen(String hostName) throws SQLException {
+    public Integer addTicketLineList(SharedTicket order, Ticket ticket) throws SQLException {
         try {
-            QueryBuilder qb = closedCashDao.queryBuilder();
-            qb.where().eq(ClosedCash.HOST, hostName).and().isNull(ClosedCash.DATEEND);
-            return (ClosedCash) qb.queryForFirst();
+            Integer counter = 0;
+            for (TicketLineInfo lineInfo : order.getContent().getLines()) {
+                TicketLine line = new TicketLine();
+                line.setTicket(ticket);
+                line.setNumber(lineInfo.getM_iLine());
+                line.setPrice(BigDecimal.valueOf(lineInfo.getPrice()));
+                line.setUnit(BigDecimal.valueOf(lineInfo.getMultiply()));
+
+                Product product = new Product();
+                product.setId(lineInfo.getProductid());
+                line.setProduct(product);
+
+                Tax tax = new Tax();
+                tax.setId(lineInfo.getTax().getId());
+                line.setTax(tax);
+
+                counter = counter + ticketLineDao.create(line);
+            }
+            return counter;
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();

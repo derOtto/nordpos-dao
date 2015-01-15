@@ -30,7 +30,7 @@ public class UserDao extends BaseDaoImpl<User, String> {
 
     Dao<User, String> userDao;
 
-    protected UserDao(ConnectionSource connectionSource) throws SQLException {
+    public UserDao(ConnectionSource connectionSource) throws SQLException {
         super(connectionSource, User.class);
     }
 

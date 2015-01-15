@@ -15,32 +15,34 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package mobi.nordpos.dao.ormlite;
+package mobi.nordpos.dao.factory;
 
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.support.ConnectionSource;
 import java.sql.SQLException;
 import java.util.List;
-import mobi.nordpos.dao.model.SharedTicket;
+import java.util.UUID;
+import mobi.nordpos.dao.model.Receipt;
+import mobi.nordpos.dao.ormlite.ReceiptDao;
 
 /**
  * @author Andrey Svininykh <svininykh@gmail.com>
  */
-public class SharedTicketPersist implements PersistFactory {
+public class ReceiptPersist implements PersistFactory {
 
     ConnectionSource connectionSource;
-    SharedTicketDao sharedTicketDao;
+    ReceiptDao receiptDao;
 
     @Override
     public void init(ConnectionSource connectionSource) throws SQLException {
         this.connectionSource = connectionSource;
-        sharedTicketDao = new SharedTicketDao(connectionSource);
+        receiptDao = new ReceiptDao(connectionSource);
     }
 
     @Override
-    public SharedTicket read(Object id) throws SQLException {
+    public Receipt read(Object id) throws SQLException {
         try {
-            return sharedTicketDao.queryForId((String) id);
+            return receiptDao.queryForId((UUID) id);
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -49,9 +51,9 @@ public class SharedTicketPersist implements PersistFactory {
     }
 
     @Override
-    public List<SharedTicket> readList() throws SQLException {
+    public List<Receipt> readList() throws SQLException {
         try {
-            return sharedTicketDao.queryForAll();
+            return receiptDao.queryForAll();
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -60,11 +62,11 @@ public class SharedTicketPersist implements PersistFactory {
     }
 
     @Override
-    public SharedTicket find(String column, Object value) throws SQLException {
+    public Receipt find(String column, Object value) throws SQLException {
         try {
-            QueryBuilder qb = sharedTicketDao.queryBuilder();
+            QueryBuilder qb = receiptDao.queryBuilder();
             qb.where().like(column, value);
-            return (SharedTicket) qb.queryForFirst();
+            return (Receipt) qb.queryForFirst();
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -73,9 +75,9 @@ public class SharedTicketPersist implements PersistFactory {
     }
 
     @Override
-    public SharedTicket add(Object ticket) throws SQLException {
+    public Receipt add(Object receipt) throws SQLException {
         try {
-            return sharedTicketDao.createIfNotExists((SharedTicket) ticket);
+            return receiptDao.createIfNotExists((Receipt) receipt);
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -84,9 +86,9 @@ public class SharedTicketPersist implements PersistFactory {
     }
 
     @Override
-    public Boolean change(Object ticket) throws SQLException {
+    public Boolean change(Object receipt) throws SQLException {
         try {
-            return sharedTicketDao.update((SharedTicket) ticket) > 0;
+            return receiptDao.update((Receipt) receipt) > 0;
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -97,11 +99,12 @@ public class SharedTicketPersist implements PersistFactory {
     @Override
     public Boolean delete(Object id) throws SQLException {
         try {
-            return sharedTicketDao.deleteById((String) id) > 0;
+            return receiptDao.deleteById((UUID) id) > 0;
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
             }
         }
     }
+
 }

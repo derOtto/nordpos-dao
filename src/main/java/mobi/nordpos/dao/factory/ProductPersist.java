@@ -15,38 +15,33 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package mobi.nordpos.dao.ormlite;
+package mobi.nordpos.dao.factory;
 
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.support.ConnectionSource;
-import com.openbravo.pos.ticket.TicketLineInfo;
-import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.List;
 import mobi.nordpos.dao.model.Product;
-import mobi.nordpos.dao.model.SharedTicket;
-import mobi.nordpos.dao.model.Tax;
-import mobi.nordpos.dao.model.Ticket;
-import mobi.nordpos.dao.model.TicketLine;
+import mobi.nordpos.dao.ormlite.ProductDao;
 
 /**
  * @author Andrey Svininykh <svininykh@gmail.com>
  */
-public class TicketLinePersist implements PersistFactory {
+public class ProductPersist implements PersistFactory {
 
     ConnectionSource connectionSource;
-    TicketLineDao ticketLineDao;
+    ProductDao productDao;
 
     @Override
     public void init(ConnectionSource connectionSource) throws SQLException {
         this.connectionSource = connectionSource;
-        ticketLineDao = new TicketLineDao(connectionSource);
+        productDao = new ProductDao(connectionSource);
     }
 
     @Override
-    public TicketLine read(Object id) throws SQLException {
+    public Product read(Object id) throws SQLException {
         try {
-            return ticketLineDao.queryForId((String) id);
+            return productDao.queryForId((String) id);
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -55,9 +50,11 @@ public class TicketLinePersist implements PersistFactory {
     }
 
     @Override
-    public List<TicketLine> readList() throws SQLException {
+    public List<Product> readList() throws SQLException {
         try {
-            return ticketLineDao.queryForAll();
+            QueryBuilder qb = productDao.queryBuilder().orderBy(Product.NAME, true);
+            qb.where().isNotNull(Product.ID);
+            return qb.query();
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -66,11 +63,11 @@ public class TicketLinePersist implements PersistFactory {
     }
 
     @Override
-    public TicketLine find(String column, Object value) throws SQLException {
+    public Product find(String column, Object value) throws SQLException {
         try {
-            QueryBuilder qb = ticketLineDao.queryBuilder();
+            QueryBuilder qb = productDao.queryBuilder();
             qb.where().like(column, value);
-            return (TicketLine) qb.queryForFirst();
+            return (Product) qb.queryForFirst();
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -79,9 +76,9 @@ public class TicketLinePersist implements PersistFactory {
     }
 
     @Override
-    public TicketLine add(Object application) throws SQLException {
+    public Product add(Object product) throws SQLException {
         try {
-            return ticketLineDao.createIfNotExists((TicketLine) application);
+            return productDao.createIfNotExists((Product) product);
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -90,9 +87,9 @@ public class TicketLinePersist implements PersistFactory {
     }
 
     @Override
-    public Boolean change(Object application) throws SQLException {
+    public Boolean change(Object product) throws SQLException {
         try {
-            return ticketLineDao.update((TicketLine) application) > 0;
+            return productDao.update((Product) product) > 0;
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -103,7 +100,7 @@ public class TicketLinePersist implements PersistFactory {
     @Override
     public Boolean delete(Object id) throws SQLException {
         try {
-            return ticketLineDao.deleteById((String) id) > 0;
+            return productDao.deleteById((String) id) > 0;
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -111,27 +108,11 @@ public class TicketLinePersist implements PersistFactory {
         }
     }
 
-    public Integer addTicketLineList(SharedTicket order, Ticket ticket) throws SQLException {
+    public List<Product> listByCodePrefix(String prefix) throws SQLException {
         try {
-            Integer counter = 0;
-            for (TicketLineInfo lineInfo : order.getContent().getLines()) {
-                TicketLine line = new TicketLine();
-                line.setTicket(ticket);
-                line.setNumber(lineInfo.getM_iLine());
-                line.setPrice(BigDecimal.valueOf(lineInfo.getPrice()));
-                line.setUnit(BigDecimal.valueOf(lineInfo.getMultiply()));
-
-                Product product = new Product();
-                product.setId(lineInfo.getProductid());
-                line.setProduct(product);
-
-                Tax tax = new Tax();
-                tax.setId(lineInfo.getTax().getId());
-                line.setTax(tax);
-
-                counter = counter + ticketLineDao.create(line);
-            }
-            return counter;
+            QueryBuilder qb = productDao.queryBuilder();
+            qb.where().like(Product.CODE, prefix.concat("%"));
+            return qb.query();
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();

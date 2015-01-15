@@ -15,33 +15,36 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package mobi.nordpos.dao.ormlite;
+package mobi.nordpos.dao.factory;
 
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.support.ConnectionSource;
+import com.openbravo.pos.sales.TaxesLogic;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.List;
-import java.util.UUID;
-import mobi.nordpos.dao.model.Customer;
+import mobi.nordpos.dao.model.Tax;
+import mobi.nordpos.dao.ormlite.TaxDao;
 
 /**
  * @author Andrey Svininykh <svininykh@gmail.com>
  */
-public class CustomerPersist implements PersistFactory {
+public class TaxPersist implements PersistFactory {
 
     ConnectionSource connectionSource;
-    CustomerDao customerDao;
+    TaxDao taxDao;
 
     @Override
     public void init(ConnectionSource connectionSource) throws SQLException {
         this.connectionSource = connectionSource;
-        customerDao = new CustomerDao(connectionSource);
+        taxDao = new TaxDao(connectionSource);
     }
 
     @Override
-    public Customer read(Object id) throws SQLException {
+    public Tax read(Object taxCategoryId) throws SQLException {
         try {
-            return customerDao.queryForId((UUID) id);
+            TaxesLogic taxLogic = new TaxesLogic(taxDao.queryForAll());
+            return taxLogic.getTax((String) taxCategoryId, new Date());
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -50,11 +53,9 @@ public class CustomerPersist implements PersistFactory {
     }
 
     @Override
-    public List<Customer> readList() throws SQLException {
+    public List<Tax> readList() throws SQLException {
         try {
-            QueryBuilder qb = customerDao.queryBuilder().orderBy(Customer.NAME, true);
-            qb.where().isNotNull(Customer.ID);
-            return qb.query();
+            return taxDao.queryForAll();
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -63,11 +64,11 @@ public class CustomerPersist implements PersistFactory {
     }
 
     @Override
-    public Customer find(String column, Object value) throws SQLException {
+    public Tax find(String column, Object value) throws SQLException {
         try {
-            QueryBuilder qb = customerDao.queryBuilder();
+            QueryBuilder qb = taxDao.queryBuilder();
             qb.where().like(column, value);
-            return (Customer) qb.queryForFirst();
+            return (Tax) qb.queryForFirst();
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -76,9 +77,9 @@ public class CustomerPersist implements PersistFactory {
     }
 
     @Override
-    public Customer add(Object customer) throws SQLException {
+    public Tax add(Object tax) throws SQLException {
         try {
-            return customerDao.createIfNotExists((Customer) customer);
+            return taxDao.createIfNotExists((Tax) tax);
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -87,9 +88,9 @@ public class CustomerPersist implements PersistFactory {
     }
 
     @Override
-    public Boolean change(Object customer) throws SQLException {
+    public Boolean change(Object tax) throws SQLException {
         try {
-            return customerDao.update((Customer) customer) > 0;
+            return taxDao.update((Tax) tax) > 0;
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -100,7 +101,7 @@ public class CustomerPersist implements PersistFactory {
     @Override
     public Boolean delete(Object id) throws SQLException {
         try {
-            return customerDao.deleteById((UUID) id) > 0;
+            return taxDao.deleteById((String) id) > 0;
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();

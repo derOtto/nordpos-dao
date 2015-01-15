@@ -15,72 +15,58 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package mobi.nordpos.dao.ormlite;
+package mobi.nordpos.dao.factory;
 
-import com.j256.ormlite.dao.CloseableWrappedIterable;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.support.ConnectionSource;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
-import mobi.nordpos.dao.model.Product;
-import mobi.nordpos.dao.model.ProductCategory;
+import java.util.UUID;
+import mobi.nordpos.dao.model.ClosedCash;
+import mobi.nordpos.dao.ormlite.ClosedCashDao;
 
 /**
  * @author Andrey Svininykh <svininykh@gmail.com>
  */
-public class ProductCategoryPersist implements PersistFactory {
+public class ClosedCashPersist implements PersistFactory {
 
     ConnectionSource connectionSource;
-    ProductCategoryDao productCategoryDao;
-    
+    ClosedCashDao closedCashDao;
+
     @Override
     public void init(ConnectionSource connectionSource) throws SQLException {
         this.connectionSource = connectionSource;
-        productCategoryDao = new ProductCategoryDao(connectionSource);
+        closedCashDao = new ClosedCashDao(connectionSource);
     }
 
     @Override
-    public ProductCategory read(Object id) throws SQLException {
+    public ClosedCash read(Object id) throws SQLException {
         try {
-            return productCategoryDao.queryForId((String) id);
-        } finally {            
-            if (connectionSource != null) {
-                connectionSource.close();
-            }
-        }
-    }
-    
-    @Override
-    public List<ProductCategory> readList() throws SQLException {
-        try {
-            QueryBuilder qb = productCategoryDao.queryBuilder().orderBy(ProductCategory.NAME, true);
-            qb.where().isNotNull(ProductCategory.ID);
-            return qb.query();
+            return closedCashDao.queryForId((UUID) id);
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
             }
         }
-    } 
+    }
 
     @Override
-    public ProductCategory find(String column, Object value) throws SQLException {
+    public List<ClosedCash> readList() throws SQLException {
         try {
-            QueryBuilder qb = productCategoryDao.queryBuilder();
+            return closedCashDao.queryForAll();
+        } finally {
+            if (connectionSource != null) {
+                connectionSource.close();
+            }
+        }
+    }
+
+    @Override
+    public ClosedCash find(String column, Object value) throws SQLException {
+        try {
+            QueryBuilder qb = closedCashDao.queryBuilder();
             qb.where().like(column, value);
-            return (ProductCategory) qb.queryForFirst();
-        } finally {
-            if (connectionSource != null) {
-                connectionSource.close();
-            }
-        }
-    }
-    
-    @Override
-    public ProductCategory add(Object category) throws SQLException {
-        try {
-            return productCategoryDao.createIfNotExists((ProductCategory) category);
+            return (ClosedCash) qb.queryForFirst();
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -89,9 +75,20 @@ public class ProductCategoryPersist implements PersistFactory {
     }
 
     @Override
-    public Boolean change(Object category) throws SQLException {
+    public ClosedCash add(Object closedCash) throws SQLException {
         try {
-            return productCategoryDao.update((ProductCategory) category) > 0;
+            return closedCashDao.createIfNotExists((ClosedCash) closedCash);
+        } finally {
+            if (connectionSource != null) {
+                connectionSource.close();
+            }
+        }
+    }
+
+    @Override
+    public Boolean change(Object closedCash) throws SQLException {
+        try {
+            return closedCashDao.update((ClosedCash) closedCash) > 0;
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -102,7 +99,7 @@ public class ProductCategoryPersist implements PersistFactory {
     @Override
     public Boolean delete(Object id) throws SQLException {
         try {
-            return productCategoryDao.deleteById((String) id) > 0;
+            return closedCashDao.deleteById((UUID) id) > 0;
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -110,16 +107,15 @@ public class ProductCategoryPersist implements PersistFactory {
         }
     }
 
-    public List<Product> readProductList(ProductCategory category) throws SQLException {
-        CloseableWrappedIterable<Product> iterator = category.getProductCollection().getWrappedIterable();
-        List<Product> list = new ArrayList<>();
+    public ClosedCash readOpen(String hostName) throws SQLException {
         try {
-            for (Product product : iterator) {
-                list.add(product);
-            }
-            return list;
+            QueryBuilder qb = closedCashDao.queryBuilder();
+            qb.where().eq(ClosedCash.HOST, hostName).and().isNull(ClosedCash.DATEEND);
+            return (ClosedCash) qb.queryForFirst();
         } finally {
-            iterator.close();
+            if (connectionSource != null) {
+                connectionSource.close();
+            }
         }
     }
 }

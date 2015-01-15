@@ -15,35 +15,33 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package mobi.nordpos.dao.ormlite;
+package mobi.nordpos.dao.factory;
 
-import com.j256.ormlite.dao.CloseableWrappedIterable;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.support.ConnectionSource;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
-import mobi.nordpos.dao.model.Floor;
-import mobi.nordpos.dao.model.Place;
+import mobi.nordpos.dao.model.SharedTicket;
+import mobi.nordpos.dao.ormlite.SharedTicketDao;
 
 /**
  * @author Andrey Svininykh <svininykh@gmail.com>
  */
-public class FloorPersist implements PersistFactory {
+public class SharedTicketPersist implements PersistFactory {
 
     ConnectionSource connectionSource;
-    FloorDao floorDao;
+    SharedTicketDao sharedTicketDao;
 
     @Override
     public void init(ConnectionSource connectionSource) throws SQLException {
         this.connectionSource = connectionSource;
-        floorDao = new FloorDao(connectionSource);
+        sharedTicketDao = new SharedTicketDao(connectionSource);
     }
 
     @Override
-    public Floor read(Object id) throws SQLException {
+    public SharedTicket read(Object id) throws SQLException {
         try {
-            return floorDao.queryForId((String) id);
+            return sharedTicketDao.queryForId((String) id);
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -52,11 +50,9 @@ public class FloorPersist implements PersistFactory {
     }
 
     @Override
-    public List<Floor> readList() throws SQLException {
+    public List<SharedTicket> readList() throws SQLException {
         try {
-            QueryBuilder qb = floorDao.queryBuilder().orderBy(Floor.NAME, true);
-            qb.where().isNotNull(Floor.ID);
-            return qb.query();
+            return sharedTicketDao.queryForAll();
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -65,35 +61,11 @@ public class FloorPersist implements PersistFactory {
     }
 
     @Override
-    public Floor find(String column, Object value) throws SQLException {
+    public SharedTicket find(String column, Object value) throws SQLException {
         try {
-            QueryBuilder qb = floorDao.queryBuilder();
+            QueryBuilder qb = sharedTicketDao.queryBuilder();
             qb.where().like(column, value);
-            return (Floor) qb.queryForFirst();
-        } finally {
-            if (connectionSource != null) {
-                connectionSource.close();
-            }
-        }
-    }
-
-    public List<Place> readPlaceList(Floor floor) throws SQLException {
-        CloseableWrappedIterable<Place> iterator = floor.getPlaceCollection().getWrappedIterable();
-        List<Place> list = new ArrayList<>();
-        try {
-            for (Place place : iterator) {
-                list.add(place);
-            }
-            return list;
-        } finally {
-            iterator.close();
-        }
-    }
-
-    @Override
-    public Floor add(Object floor) throws SQLException {
-        try {
-            return floorDao.createIfNotExists((Floor) floor);
+            return (SharedTicket) qb.queryForFirst();
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -102,9 +74,20 @@ public class FloorPersist implements PersistFactory {
     }
 
     @Override
-    public Boolean change(Object floor) throws SQLException {
+    public SharedTicket add(Object ticket) throws SQLException {
         try {
-            return floorDao.update((Floor) floor) > 0;
+            return sharedTicketDao.createIfNotExists((SharedTicket) ticket);
+        } finally {
+            if (connectionSource != null) {
+                connectionSource.close();
+            }
+        }
+    }
+
+    @Override
+    public Boolean change(Object ticket) throws SQLException {
+        try {
+            return sharedTicketDao.update((SharedTicket) ticket) > 0;
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -115,12 +98,11 @@ public class FloorPersist implements PersistFactory {
     @Override
     public Boolean delete(Object id) throws SQLException {
         try {
-            return floorDao.deleteById((String) id) > 0;
+            return sharedTicketDao.deleteById((String) id) > 0;
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
             }
         }
     }
-
 }

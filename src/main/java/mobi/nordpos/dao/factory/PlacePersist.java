@@ -15,32 +15,33 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package mobi.nordpos.dao.ormlite;
+package mobi.nordpos.dao.factory;
 
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.support.ConnectionSource;
 import java.sql.SQLException;
 import java.util.List;
-import mobi.nordpos.dao.model.TaxCategory;
+import mobi.nordpos.dao.model.Place;
+import mobi.nordpos.dao.ormlite.PlaceDao;
 
 /**
  * @author Andrey Svininykh <svininykh@gmail.com>
  */
-public class TaxCategoryPersist implements PersistFactory {
+public class PlacePersist implements PersistFactory {
 
     ConnectionSource connectionSource;
-    TaxCategoryDao taxCategoryDao;
+    PlaceDao placeDao;
 
     @Override
     public void init(ConnectionSource connectionSource) throws SQLException {
         this.connectionSource = connectionSource;
-        taxCategoryDao = new TaxCategoryDao(connectionSource);
+        placeDao = new PlaceDao(connectionSource);
     }
 
     @Override
-    public TaxCategory read(Object id) throws SQLException {
+    public Place read(Object id) throws SQLException {
         try {
-            return taxCategoryDao.queryForId((String) id);
+            return placeDao.queryForId((String) id);
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -49,9 +50,11 @@ public class TaxCategoryPersist implements PersistFactory {
     }
 
     @Override
-    public List<TaxCategory> readList() throws SQLException {
+    public List<Place> readList() throws SQLException {
         try {
-            return taxCategoryDao.queryForAll();
+            QueryBuilder qb = placeDao.queryBuilder().orderBy(Place.NAME, true);
+            qb.where().isNotNull(Place.ID);
+            return qb.query();
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -60,11 +63,11 @@ public class TaxCategoryPersist implements PersistFactory {
     }
 
     @Override
-    public TaxCategory find(String column, Object value) throws SQLException {
+    public Place find(String column, Object value) throws SQLException {
         try {
-            QueryBuilder qb = taxCategoryDao.queryBuilder();
+            QueryBuilder qb = placeDao.queryBuilder();
             qb.where().like(column, value);
-            return (TaxCategory) qb.queryForFirst();
+            return (Place) qb.queryForFirst();
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -73,9 +76,9 @@ public class TaxCategoryPersist implements PersistFactory {
     }
 
     @Override
-    public TaxCategory add(Object taxCategory) throws SQLException {
+    public Place add(Object place) throws SQLException {
         try {
-            return taxCategoryDao.createIfNotExists((TaxCategory) taxCategory);
+            return placeDao.createIfNotExists((Place) place);
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -84,9 +87,9 @@ public class TaxCategoryPersist implements PersistFactory {
     }
 
     @Override
-    public Boolean change(Object taxCategory) throws SQLException {
+    public Boolean change(Object place) throws SQLException {
         try {
-            return taxCategoryDao.update((TaxCategory) taxCategory) > 0;
+            return placeDao.update((Place) place) > 0;
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -97,7 +100,7 @@ public class TaxCategoryPersist implements PersistFactory {
     @Override
     public Boolean delete(Object id) throws SQLException {
         try {
-            return taxCategoryDao.deleteById((String) id) > 0;
+            return placeDao.deleteById((String) id) > 0;
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();

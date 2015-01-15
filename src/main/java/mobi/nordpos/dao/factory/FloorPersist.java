@@ -15,33 +15,36 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package mobi.nordpos.dao.ormlite;
+package mobi.nordpos.dao.factory;
 
+import com.j256.ormlite.dao.CloseableWrappedIterable;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.support.ConnectionSource;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
-import mobi.nordpos.dao.model.Payment;
+import mobi.nordpos.dao.model.Floor;
+import mobi.nordpos.dao.model.Place;
+import mobi.nordpos.dao.ormlite.FloorDao;
 
 /**
  * @author Andrey Svininykh <svininykh@gmail.com>
  */
-public class PaymentPersist implements PersistFactory {
+public class FloorPersist implements PersistFactory {
 
     ConnectionSource connectionSource;
-    PaymentDao paymentDao;
+    FloorDao floorDao;
 
     @Override
     public void init(ConnectionSource connectionSource) throws SQLException {
         this.connectionSource = connectionSource;
-        paymentDao = new PaymentDao(connectionSource);
+        floorDao = new FloorDao(connectionSource);
     }
 
     @Override
-    public Payment read(Object id) throws SQLException {
+    public Floor read(Object id) throws SQLException {
         try {
-            return paymentDao.queryForId((UUID) id);
+            return floorDao.queryForId((String) id);
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -50,9 +53,11 @@ public class PaymentPersist implements PersistFactory {
     }
 
     @Override
-    public List<Payment> readList() throws SQLException {
+    public List<Floor> readList() throws SQLException {
         try {
-            return paymentDao.queryForAll();
+            QueryBuilder qb = floorDao.queryBuilder().orderBy(Floor.NAME, true);
+            qb.where().isNotNull(Floor.ID);
+            return qb.query();
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -61,11 +66,35 @@ public class PaymentPersist implements PersistFactory {
     }
 
     @Override
-    public Payment find(String column, Object value) throws SQLException {
+    public Floor find(String column, Object value) throws SQLException {
         try {
-            QueryBuilder qb = paymentDao.queryBuilder();
+            QueryBuilder qb = floorDao.queryBuilder();
             qb.where().like(column, value);
-            return (Payment) qb.queryForFirst();
+            return (Floor) qb.queryForFirst();
+        } finally {
+            if (connectionSource != null) {
+                connectionSource.close();
+            }
+        }
+    }
+
+    public List<Place> readPlaceList(Floor floor) throws SQLException {
+        CloseableWrappedIterable<Place> iterator = floor.getPlaceCollection().getWrappedIterable();
+        List<Place> list = new ArrayList<>();
+        try {
+            for (Place place : iterator) {
+                list.add(place);
+            }
+            return list;
+        } finally {
+            iterator.close();
+        }
+    }
+
+    @Override
+    public Floor add(Object floor) throws SQLException {
+        try {
+            return floorDao.createIfNotExists((Floor) floor);
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -74,20 +103,9 @@ public class PaymentPersist implements PersistFactory {
     }
 
     @Override
-    public Payment add(Object payment) throws SQLException {
+    public Boolean change(Object floor) throws SQLException {
         try {
-            return paymentDao.createIfNotExists((Payment) payment);
-        } finally {
-            if (connectionSource != null) {
-                connectionSource.close();
-            }
-        }
-    }
-
-    @Override
-    public Boolean change(Object payment) throws SQLException {
-        try {
-            return paymentDao.update((Payment) payment) > 0;
+            return floorDao.update((Floor) floor) > 0;
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -98,7 +116,7 @@ public class PaymentPersist implements PersistFactory {
     @Override
     public Boolean delete(Object id) throws SQLException {
         try {
-            return paymentDao.deleteById((UUID) id) > 0;
+            return floorDao.deleteById((String) id) > 0;
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();

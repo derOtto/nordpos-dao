@@ -15,32 +15,33 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package mobi.nordpos.dao.ormlite;
+package mobi.nordpos.dao.factory;
 
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.support.ConnectionSource;
 import java.sql.SQLException;
 import java.util.List;
-import mobi.nordpos.dao.model.Application;
+import mobi.nordpos.dao.model.TicketNumber;
+import mobi.nordpos.dao.ormlite.TicketNumberDao;
 
 /**
  * @author Andrey Svininykh <svininykh@gmail.com>
  */
-public class ApplicationPersist implements PersistFactory {
+public class TicketNumberPersist implements PersistFactory {
 
     ConnectionSource connectionSource;
-    ApplicationDao applicationDao;
+    TicketNumberDao ticketNumberDao;
 
     @Override
     public void init(ConnectionSource connectionSource) throws SQLException {
         this.connectionSource = connectionSource;
-        applicationDao = new ApplicationDao(connectionSource);
+        ticketNumberDao = new TicketNumberDao(connectionSource);
     }
 
     @Override
-    public Application read(Object id) throws SQLException {
+    public TicketNumber read(Object id) throws SQLException {
         try {
-            return applicationDao.queryForId((String) id);
+            return ticketNumberDao.queryForId((Integer) id);
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -49,9 +50,9 @@ public class ApplicationPersist implements PersistFactory {
     }
 
     @Override
-    public List<Application> readList() throws SQLException {
+    public List<TicketNumber> readList() throws SQLException {
         try {
-            return applicationDao.queryForAll();
+            return ticketNumberDao.queryForAll();
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -60,11 +61,11 @@ public class ApplicationPersist implements PersistFactory {
     }
 
     @Override
-    public Application find(String column, Object value) throws SQLException {
+    public TicketNumber find(String column, Object value) throws SQLException {
         try {
-            QueryBuilder qb = applicationDao.queryBuilder();
+            QueryBuilder qb = ticketNumberDao.queryBuilder();
             qb.where().like(column, value);
-            return (Application) qb.queryForFirst();
+            return (TicketNumber) qb.queryForFirst();
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -73,9 +74,9 @@ public class ApplicationPersist implements PersistFactory {
     }
 
     @Override
-    public Application add(Object application) throws SQLException {
+    public TicketNumber add(Object ticketNumber) throws SQLException {
         try {
-            return applicationDao.createIfNotExists((Application) application);
+            return ticketNumberDao.createIfNotExists((TicketNumber) ticketNumber);
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -84,9 +85,10 @@ public class ApplicationPersist implements PersistFactory {
     }
 
     @Override
-    public Boolean change(Object application) throws SQLException {
+    public Boolean change(Object ticketNumber) throws SQLException {
+        TicketNumber number = (TicketNumber) ticketNumber;
         try {
-            return applicationDao.update((Application) application) > 0;
+            return ticketNumberDao.updateId(number, number.getId() + 1) > 0;
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -97,11 +99,12 @@ public class ApplicationPersist implements PersistFactory {
     @Override
     public Boolean delete(Object id) throws SQLException {
         try {
-            return applicationDao.deleteById((String) id) > 0;
+            return ticketNumberDao.deleteById((Integer) id) > 0;
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
             }
         }
     }
+
 }

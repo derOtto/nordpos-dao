@@ -15,32 +15,34 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package mobi.nordpos.dao.ormlite;
+package mobi.nordpos.dao.factory;
 
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.support.ConnectionSource;
 import java.sql.SQLException;
 import java.util.List;
-import mobi.nordpos.dao.model.Product;
+import java.util.UUID;
+import mobi.nordpos.dao.model.Payment;
+import mobi.nordpos.dao.ormlite.PaymentDao;
 
 /**
  * @author Andrey Svininykh <svininykh@gmail.com>
  */
-public class ProductPersist implements PersistFactory {
+public class PaymentPersist implements PersistFactory {
 
     ConnectionSource connectionSource;
-    ProductDao productDao;
+    PaymentDao paymentDao;
 
     @Override
     public void init(ConnectionSource connectionSource) throws SQLException {
         this.connectionSource = connectionSource;
-        productDao = new ProductDao(connectionSource);
+        paymentDao = new PaymentDao(connectionSource);
     }
 
     @Override
-    public Product read(Object id) throws SQLException {
+    public Payment read(Object id) throws SQLException {
         try {
-            return productDao.queryForId((String) id);
+            return paymentDao.queryForId((UUID) id);
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -49,11 +51,9 @@ public class ProductPersist implements PersistFactory {
     }
 
     @Override
-    public List<Product> readList() throws SQLException {
+    public List<Payment> readList() throws SQLException {
         try {
-            QueryBuilder qb = productDao.queryBuilder().orderBy(Product.NAME, true);
-            qb.where().isNotNull(Product.ID);
-            return qb.query();
+            return paymentDao.queryForAll();
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -62,11 +62,11 @@ public class ProductPersist implements PersistFactory {
     }
 
     @Override
-    public Product find(String column, Object value) throws SQLException {
+    public Payment find(String column, Object value) throws SQLException {
         try {
-            QueryBuilder qb = productDao.queryBuilder();
+            QueryBuilder qb = paymentDao.queryBuilder();
             qb.where().like(column, value);
-            return (Product) qb.queryForFirst();
+            return (Payment) qb.queryForFirst();
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -75,9 +75,9 @@ public class ProductPersist implements PersistFactory {
     }
 
     @Override
-    public Product add(Object product) throws SQLException {
+    public Payment add(Object payment) throws SQLException {
         try {
-            return productDao.createIfNotExists((Product) product);
+            return paymentDao.createIfNotExists((Payment) payment);
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -86,9 +86,9 @@ public class ProductPersist implements PersistFactory {
     }
 
     @Override
-    public Boolean change(Object product) throws SQLException {
+    public Boolean change(Object payment) throws SQLException {
         try {
-            return productDao.update((Product) product) > 0;
+            return paymentDao.update((Payment) payment) > 0;
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -99,7 +99,7 @@ public class ProductPersist implements PersistFactory {
     @Override
     public Boolean delete(Object id) throws SQLException {
         try {
-            return productDao.deleteById((String) id) > 0;
+            return paymentDao.deleteById((UUID) id) > 0;
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -107,15 +107,4 @@ public class ProductPersist implements PersistFactory {
         }
     }
 
-    public List<Product> listByCodePrefix(String prefix) throws SQLException {
-        try {
-            QueryBuilder qb = productDao.queryBuilder();
-            qb.where().like(Product.CODE, prefix.concat("%"));
-            return qb.query();
-        } finally {
-            if (connectionSource != null) {
-                connectionSource.close();
-            }
-        }
-    }
 }
