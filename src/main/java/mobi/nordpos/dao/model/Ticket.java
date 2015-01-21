@@ -21,7 +21,9 @@ import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
-import java.util.UUID;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.List;
 
 /**
  * @author Andrey Svininykh <svininykh@gmail.com>
@@ -51,7 +53,7 @@ public final class Ticket {
     public static final String STATUS = "STATUS";
 
     @DatabaseField(id = true, columnName = ID, canBeNull = false)
-    private UUID id;
+    private String id;
 
     @DatabaseField(columnName = TICKETTYPE, canBeNull = false, uniqueCombo = true, indexName = "TICKETS_TICKETID", defaultValue = "0")
     private Integer type;
@@ -64,15 +66,33 @@ public final class Ticket {
 
     @DatabaseField(foreign = true, foreignAutoRefresh = true, foreignColumnName = Customer.ID, columnName = CUSTOMER, canBeNull = true)
     private Customer customer;
-    
+
     @ForeignCollectionField(orderAscending = true, orderColumnName = TicketLine.ID, eager = true)
     private ForeignCollection<TicketLine> ticketLineCollection;
 
-    public UUID getId() {
+    @DatabaseField(persisted = false)
+    private List<TicketLine> ticketLineList;
+
+    @DatabaseField(persisted = false)
+    private Receipt receipt;
+
+    @DatabaseField(persisted = false)
+    private BigDecimal totalValue;
+
+    @DatabaseField(persisted = false)
+    private BigDecimal taxAmount;
+
+    @DatabaseField(persisted = false)
+    private BigDecimal subValue;
+
+    @DatabaseField(persisted = false)
+    private BigDecimal totalUnit;
+
+    public String getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -110,6 +130,54 @@ public final class Ticket {
 
     public ForeignCollection<TicketLine> getTicketLineCollection() {
         return ticketLineCollection;
+    }
+
+    public List<TicketLine> getTicketLineList() {
+        return ticketLineList;
+    }
+
+    public void setTicketLineList(List<TicketLine> ticketLineList) {
+        this.ticketLineList = ticketLineList;
+    }
+
+    public Receipt getReceipt() {
+        return receipt;
+    }
+
+    public void setReceipt(Receipt receipt) {
+        this.receipt = receipt;
+    }
+
+    public BigDecimal getTotalValue() {
+        totalValue = BigDecimal.ZERO;
+        for (TicketLine line : ticketLineList) {
+            totalValue = totalValue.add(line.getTaxPrice());
+        }
+        return totalValue.setScale(2, RoundingMode.HALF_DOWN);
+    }
+
+    public BigDecimal getTaxAmount() {
+        taxAmount = BigDecimal.ZERO;
+        for (TicketLine line : ticketLineList) {
+            taxAmount = taxAmount.add(line.getTaxAmount());
+        }
+        return taxAmount.setScale(2, RoundingMode.HALF_DOWN);
+    }
+
+    public BigDecimal getSubValue() {
+        subValue = BigDecimal.ZERO;
+        for (TicketLine line : ticketLineList) {
+            subValue = subValue.add(line.getPrice());
+        }
+        return subValue.setScale(2, RoundingMode.HALF_DOWN);
+    }
+
+    public BigDecimal getTotalUnit() {
+        totalUnit = BigDecimal.ZERO;
+        for (TicketLine line : ticketLineList) {
+            totalUnit = totalUnit.add(line.getUnit());
+        }
+        return totalUnit;
     }
 
 }

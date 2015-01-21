@@ -23,7 +23,6 @@ import com.j256.ormlite.support.ConnectionSource;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import mobi.nordpos.dao.model.Ticket;
 import mobi.nordpos.dao.model.TicketLine;
 import mobi.nordpos.dao.ormlite.TicketDao;
@@ -45,7 +44,7 @@ public class TicketPersist implements PersistFactory {
     @Override
     public Ticket read(Object id) throws SQLException {
         try {
-            return ticketDao.queryForId((UUID) id);
+            return ticketDao.queryForId((String) id);
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();
@@ -102,7 +101,7 @@ public class TicketPersist implements PersistFactory {
     @Override
     public Boolean delete(Object id) throws SQLException {
         try {
-            return ticketDao.deleteById((UUID) id) > 0;
+            return ticketDao.deleteById((String) id) > 0;
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();

@@ -40,9 +40,9 @@ public class Customer {
     public static final String SEARCHKEY = "SEARCHKEY";
     public static final String TAXCATEGORY = "TAXCATEGORY";
     public static final String EMAIL = "EMAIL";
-    public static final String ATTRIBUTES = "ATTRIBUTES";
-    
-    private static String LOGIN_PASSWORD_KEY = "customer.login.password";
+    public static final String PROPERTIES = "PROPERTIES";
+
+    private static final String LOGIN_PASSWORD_KEY = "customer.login.password";
 
     @DatabaseField(generatedId = true, columnName = ID)
     private UUID id;
@@ -63,8 +63,8 @@ public class Customer {
     @DatabaseField(columnName = EMAIL, canBeNull = true)
     private String email;
 
-    @DatabaseField(columnName = ATTRIBUTES, dataType = DataType.BYTE_ARRAY)
-    byte[] attributes;
+    @DatabaseField(columnName = PROPERTIES, dataType = DataType.BYTE_ARRAY)
+    byte[] properties;
 
     public UUID getId() {
         return id;
@@ -106,26 +106,18 @@ public class Customer {
         this.email = email;
     }
 
-    public byte[] getAttributes() {
-        return attributes;
-    }
-
-    public void setAttributes(byte[] attributes) {
-        this.attributes = attributes;
-    }
-
     public Properties getProperties() throws IOException {
-        Properties properties = new Properties();
-        if (this.attributes != null) {
-            properties.loadFromXML(new ByteArrayInputStream(this.attributes));
+        Properties p = new Properties();
+        if (this.properties != null) {
+            p.loadFromXML(new ByteArrayInputStream(this.properties));
         }
-        return properties;
+        return p;
     }
 
-    public void setProperties(Properties properties) throws IOException {
+    public void setProperties(Properties p) throws IOException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        properties.storeToXML(outputStream, "Customer attributes", "UTF-8");
-        setAttributes(outputStream.toByteArray());
+        p.storeToXML(outputStream, "Customer properties", "UTF-8");
+        this.properties = outputStream.toByteArray();
     }
 
     public String getPassword() throws IOException {
@@ -133,9 +125,9 @@ public class Customer {
     }
 
     public void setPassword(String password) throws UnsupportedEncodingException, NoSuchAlgorithmException, IOException {
-        Properties properties = getProperties();
-        properties.setProperty(LOGIN_PASSWORD_KEY, Hashcypher.hashString(password));
-        setProperties(properties);
+        Properties p = getProperties();
+        p.setProperty(LOGIN_PASSWORD_KEY, Hashcypher.hashString(password));
+        setProperties(p);
     }
 
     public boolean isAuthentication(String password) throws UnsupportedEncodingException, NoSuchAlgorithmException, IOException {

@@ -17,6 +17,7 @@
  */
 package mobi.nordpos.dao.factory;
 
+import com.j256.ormlite.dao.CloseableWrappedIterable;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.support.ConnectionSource;
 import com.openbravo.pos.ticket.TicketLineInfo;
@@ -112,6 +113,19 @@ public class TaxLinePersist implements PersistFactory {
             if (connectionSource != null) {
                 connectionSource.close();
             }
+        }
+    }
+
+    public List<TaxLine> readTaxLineList(Receipt receipt) throws SQLException {
+        CloseableWrappedIterable<TaxLine> iterator = receipt.getTaxLineCollection().getWrappedIterable();
+        List<TaxLine> list = new ArrayList<>();
+        try {
+            for (TaxLine line : iterator) {
+                list.add(line);
+            }
+            return list;
+        } finally {
+            iterator.close();
         }
     }
 

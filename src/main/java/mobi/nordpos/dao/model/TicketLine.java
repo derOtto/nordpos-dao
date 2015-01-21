@@ -119,6 +119,18 @@ public class TicketLine {
         this.product = product;
     }
 
+    public BigDecimal getTaxPrice() {
+        return price
+                .multiply(getTax().getRate().add(BigDecimal.ONE))
+                .setScale(2, BigDecimal.ROUND_HALF_DOWN);
+    }
+
+    public BigDecimal getTaxAmount() {
+        return price
+                .multiply(getTax().getRate())
+                .setScale(2, BigDecimal.ROUND_HALF_DOWN);
+    }
+
     @Override
     public boolean equals(Object other) {
         if (other == null || other.getClass() != this.getClass()) {

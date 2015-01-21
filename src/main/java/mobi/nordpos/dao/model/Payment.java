@@ -1,6 +1,6 @@
 /**
  * Copyright (c) 2012-2015 Nord Trading Network.
- * 
+ *
  * http://www.nordpos.mobi
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -46,18 +46,22 @@ public class Payment {
     public static final String RECEIPT = "RECEIPT";
     public static final String PAYMENT = "PAYMENT";
     public static final String TOTAL = "TOTAL";
+    public static final String TRANSID = "TRANSID";
 
     @DatabaseField(generatedId = true, columnName = ID)
     private UUID id;
 
-    @DatabaseField(foreign = true, foreignAutoRefresh = true, columnName = RECEIPT, canBeNull = false)
+    @DatabaseField(foreign = true, foreignAutoRefresh = true, columnName = RECEIPT, canBeNull = false, index = true, indexName = "PAYMENTS_RECEIPT_INX")
     private Receipt receipt;
 
-    @DatabaseField(columnName = PAYMENT, canBeNull = false)
+    @DatabaseField(columnName = PAYMENT, canBeNull = false, index = true, indexName = "PAYMENTS_INX_1")
     private String type;
 
     @DatabaseField(columnName = TOTAL, canBeNull = false)
     private BigDecimal amount;
+
+    @DatabaseField(columnName = TRANSID)
+    private String transactionId;
 
     public UUID getId() {
         return id;
@@ -89,5 +93,13 @@ public class Payment {
 
     public void setReceipt(Receipt receipt) {
         this.receipt = receipt;
+    }
+
+    public String getTransactionId() {
+        return transactionId;
+    }
+
+    public void setTransactionId(String transactionId) {
+        this.transactionId = transactionId;
     }
 }

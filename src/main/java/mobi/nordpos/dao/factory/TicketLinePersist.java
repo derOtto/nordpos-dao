@@ -17,11 +17,13 @@
  */
 package mobi.nordpos.dao.factory;
 
+import com.j256.ormlite.dao.CloseableWrappedIterable;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.support.ConnectionSource;
 import com.openbravo.pos.ticket.TicketLineInfo;
 import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import mobi.nordpos.dao.model.Product;
 import mobi.nordpos.dao.model.SharedTicket;
@@ -109,6 +111,19 @@ public class TicketLinePersist implements PersistFactory {
             if (connectionSource != null) {
                 connectionSource.close();
             }
+        }
+    }
+
+    public List<TicketLine> readTicketLineList(Ticket ticket) throws SQLException {
+        CloseableWrappedIterable<TicketLine> iterator = ticket.getTicketLineCollection().getWrappedIterable();
+        List<TicketLine> list = new ArrayList<>();
+        try {
+            for (TicketLine line : iterator) {
+                list.add(line);
+            }
+            return list;
+        } finally {
+            iterator.close();
         }
     }
 

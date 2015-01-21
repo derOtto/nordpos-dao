@@ -17,12 +17,15 @@
  */
 package mobi.nordpos.dao.factory;
 
+import com.j256.ormlite.dao.CloseableWrappedIterable;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.support.ConnectionSource;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import mobi.nordpos.dao.model.Payment;
+import mobi.nordpos.dao.model.Receipt;
 import mobi.nordpos.dao.ormlite.PaymentDao;
 
 /**
@@ -107,4 +110,16 @@ public class PaymentPersist implements PersistFactory {
         }
     }
 
+    public List<Payment> readPaymentList(Receipt receipt) throws SQLException {
+        CloseableWrappedIterable<Payment> iterator = receipt.getPaymentCollection().getWrappedIterable();
+        List<Payment> list = new ArrayList<>();
+        try {
+            for (Payment payment : iterator) {
+                list.add(payment);
+            }
+            return list;
+        } finally {
+            iterator.close();
+        }
+    }
 }

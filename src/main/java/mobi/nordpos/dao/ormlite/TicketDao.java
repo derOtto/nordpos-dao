@@ -21,15 +21,14 @@ import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.support.ConnectionSource;
 import java.sql.SQLException;
-import java.util.UUID;
 import mobi.nordpos.dao.model.Ticket;
 
 /**
  * @author Andrey Svininykh <svininykh@gmail.com>
  */
-public class TicketDao extends BaseDaoImpl<Ticket, UUID> {
+public class TicketDao extends BaseDaoImpl<Ticket, String> {
 
-    Dao<Ticket, UUID> ticketDao;
+    Dao<Ticket, String> ticketDao;
 
     public TicketDao(ConnectionSource connectionSource) throws SQLException {
         super(connectionSource, Ticket.class);

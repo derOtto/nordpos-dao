@@ -76,10 +76,8 @@ public class SharedTicket {
     public BigDecimal getTotalValue() {
         totalValue = BigDecimal.ZERO;
         if (content != null) {
-            BigDecimal unit = BigDecimal.ZERO;
             for (TicketLineInfo line : content.getM_aLines()) {
                 totalValue = totalValue.add(BigDecimal.valueOf(line.getValue()));
-                unit = unit.add(BigDecimal.valueOf(line.getMultiply()));
             }
         }
         return totalValue.setScale(2, RoundingMode.HALF_DOWN);

@@ -98,11 +98,7 @@ public class ProductCategory {
     public void setProductList(List<Product> productList) {
         this.productList = productList;
     }
-
-    public int getProductListSize() {
-        return productList.size();
-    }
-
+    
     public byte[] getImageThumbnail(int size) throws IOException {
         return ImagePreview.createThumbnail(getImage(), size);
     }

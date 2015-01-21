@@ -157,12 +157,9 @@ public class Product {
     }
 
     public BigDecimal getTaxPriceSell() {
-        if (taxPriceSell != null) {
-            return taxPriceSell;
-        } else {
-            taxPriceSell = pricesell.multiply(getTax().getRate().add(BigDecimal.ONE)).setScale(2, BigDecimal.ROUND_HALF_DOWN);
-            return taxPriceSell;
-        }
+        return pricesell
+                .multiply(getTax().getRate().add(BigDecimal.ONE))
+                .setScale(2, BigDecimal.ROUND_HALF_DOWN);
     }
 
     public void setTaxPriceSell(BigDecimal taxPriceSell) {

@@ -23,6 +23,7 @@ import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -51,8 +52,14 @@ public class Receipt {
     @ForeignCollectionField
     ForeignCollection<Payment> paymentCollection;
 
+    @DatabaseField(persisted = false)
+    private List<Payment> paymentList;
+
     @ForeignCollectionField
     ForeignCollection<TaxLine> taxLineCollection;
+
+    @DatabaseField(persisted = false)
+    private List<TaxLine> taxList;
 
     public UUID getId() {
         return id;
@@ -86,8 +93,24 @@ public class Receipt {
         return paymentCollection;
     }
 
+    public List<Payment> getPaymentList() {
+        return paymentList;
+    }
+
+    public void setPaymentList(List<Payment> paymentList) {
+        this.paymentList = paymentList;
+    }
+
     public ForeignCollection<TaxLine> getTaxLineCollection() {
         return taxLineCollection;
+    }
+
+    public List<TaxLine> getTaxList() {
+        return taxList;
+    }
+
+    public void setTaxList(List<TaxLine> taxList) {
+        this.taxList = taxList;
     }
 
 }
