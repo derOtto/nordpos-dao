@@ -20,7 +20,6 @@ package mobi.nordpos.dao.model;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 
 /**
  * @author Andrey Svininykh <svininykh@gmail.com>
@@ -63,7 +62,7 @@ public class TicketLine {
         if (ticket == null) {
             return number.toString();
         } else {
-            return ticket.getId().toString() + "-" + number.toString();
+            return ticket.getId() + "-" + number.toString();
         }
     }
 
@@ -128,6 +127,26 @@ public class TicketLine {
     public BigDecimal getTaxAmount() {
         return price
                 .multiply(getTax().getRate())
+                .setScale(2, BigDecimal.ROUND_HALF_DOWN);
+    }
+
+    public BigDecimal getSubTotalValue() {
+        return price
+                .multiply(unit)
+                .setScale(2, BigDecimal.ROUND_HALF_DOWN);
+    }
+
+    public BigDecimal getTotalTaxAmount() {
+        return price
+                .multiply(getTax().getRate())
+                .multiply(unit)
+                .setScale(2, BigDecimal.ROUND_HALF_DOWN);
+    }
+
+    public BigDecimal getTotalValue() {
+        return price
+                .multiply(getTax().getRate().add(BigDecimal.ONE))
+                .multiply(unit)
                 .setScale(2, BigDecimal.ROUND_HALF_DOWN);
     }
 

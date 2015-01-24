@@ -22,7 +22,6 @@ import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.List;
 
 /**
@@ -80,10 +79,10 @@ public final class Ticket {
     private BigDecimal totalValue;
 
     @DatabaseField(persisted = false)
-    private BigDecimal taxAmount;
+    private BigDecimal totalTaxAmount;
 
     @DatabaseField(persisted = false)
-    private BigDecimal subValue;
+    private BigDecimal subTotalValue;
 
     @DatabaseField(persisted = false)
     private BigDecimal totalUnit;
@@ -151,25 +150,25 @@ public final class Ticket {
     public BigDecimal getTotalValue() {
         totalValue = BigDecimal.ZERO;
         for (TicketLine line : ticketLineList) {
-            totalValue = totalValue.add(line.getTaxPrice());
+            totalValue = totalValue.add(line.getTotalValue());
         }
-        return totalValue.setScale(2, RoundingMode.HALF_DOWN);
+        return totalValue;
     }
 
-    public BigDecimal getTaxAmount() {
-        taxAmount = BigDecimal.ZERO;
+    public BigDecimal getTotalTaxAmount() {
+        totalTaxAmount = BigDecimal.ZERO;
         for (TicketLine line : ticketLineList) {
-            taxAmount = taxAmount.add(line.getTaxAmount());
+            totalTaxAmount = totalTaxAmount.add(line.getTotalTaxAmount());
         }
-        return taxAmount.setScale(2, RoundingMode.HALF_DOWN);
+        return totalTaxAmount;
     }
 
-    public BigDecimal getSubValue() {
-        subValue = BigDecimal.ZERO;
+    public BigDecimal getSubTotalValue() {
+        subTotalValue = BigDecimal.ZERO;
         for (TicketLine line : ticketLineList) {
-            subValue = subValue.add(line.getPrice());
+            subTotalValue = subTotalValue.add(line.getSubTotalValue());
         }
-        return subValue.setScale(2, RoundingMode.HALF_DOWN);
+        return subTotalValue;
     }
 
     public BigDecimal getTotalUnit() {
