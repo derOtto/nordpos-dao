@@ -22,6 +22,7 @@ import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.stmt.UpdateBuilder;
 import com.j256.ormlite.stmt.mapped.MappedPreparedStmt;
 import com.j256.ormlite.support.ConnectionSource;
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.List;
 import mobi.nordpos.dao.model.Location;
@@ -65,7 +66,7 @@ public class StockCurrentPersist implements PersistFactory {
             }
         }
     }
-    
+
     @Override
     public List<StockCurrent> readList() throws SQLException {
         try {
@@ -104,11 +105,13 @@ public class StockCurrentPersist implements PersistFactory {
     @Override
     public Boolean change(Object stockCurrent) throws SQLException {
         try {
-            StockCurrent stock = (StockCurrent) stockCurrent;
-            UpdateBuilder<StockCurrent, String> ub = stockCurrentDao.updateBuilder();
-            ub.where().like(StockCurrent.LOCATION, stock.getLocation()).and().like(StockCurrent.PRODUCT, stock.getProduct());
-            ub.updateColumnValue(StockCurrent.UNITS, stock.getUnit());            
-            return ub.update() > 0;
+            StockCurrent stock = (StockCurrent) stockCurrent;            
+            UpdateBuilder<StockCurrent, String> ubId = stockCurrentDao.updateBuilder();
+            ubId.updateColumnValue(StockCurrent.ID,
+                    stock.getId())
+                    .where().like(StockCurrent.LOCATION, stock.getLocation())
+                    .and().like(StockCurrent.PRODUCT, stock.getProduct());            
+            return (stockCurrentDao.update(ubId.prepare()) > 0) && (stockCurrentDao.update(stock) > 0);
         } finally {
             if (connectionSource != null) {
                 connectionSource.close();

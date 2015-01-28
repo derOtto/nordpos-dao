@@ -44,7 +44,7 @@ public class StockCurrent {
 
     @DatabaseField(foreign = true, foreignAutoRefresh = true, maxForeignAutoRefreshLevel = 1, columnName = PRODUCT, canBeNull = true)
     private Product product;
-
+    
     public String getId() {
         return location.getId() + "-" + product.getId();
     }
