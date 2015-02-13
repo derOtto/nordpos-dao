@@ -62,7 +62,7 @@ public class TicketLine {
         if (ticket == null) {
             return number.toString();
         } else {
-            return ticket.getId() + "-" + number.toString();
+            return ticket.getId() + "." + number.toString();
         }
     }
 

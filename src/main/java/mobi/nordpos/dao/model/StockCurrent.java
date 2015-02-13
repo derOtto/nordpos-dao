@@ -46,7 +46,7 @@ public class StockCurrent {
     private Product product;
     
     public String getId() {
-        return location.getId() + "-" + product.getId();
+        return location.getId() + "." + product.getId();
     }
 
     public void setId(String id) {
