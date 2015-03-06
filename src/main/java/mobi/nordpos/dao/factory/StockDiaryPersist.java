@@ -115,20 +115,22 @@ public class StockDiaryPersist implements PersistFactory {
         try {
             Integer counter = 0;
             for (TicketLine line : lineList) {
-                StockDiary diary = new StockDiary();
-                diary.setReason(reason);
-                diary.setLocation(location);
-                diary.setDate(receipt.getDate());
-                diary.setProduct(line.getProduct());
-                diary.setPrice(line.getPrice());
+                if (line.getProduct() != null) {
+                    StockDiary diary = new StockDiary();
+                    diary.setReason(reason);
+                    diary.setLocation(location);
+                    diary.setDate(receipt.getDate());
+                    diary.setProduct(line.getProduct());
+                    diary.setPrice(line.getPrice());
 
-                if (reason >= 0) {
-                    diary.setUnit(line.getUnit());
-                } else {
-                    diary.setUnit(line.getUnit().negate());
+                    if (reason >= 0) {
+                        diary.setUnit(line.getUnit());
+                    } else {
+                        diary.setUnit(line.getUnit().negate());
+                    }
+                    
+                    counter = counter + stockDiaryDao.create(diary);
                 }
-                
-                counter = counter + stockDiaryDao.create(diary);
             }
             return counter;
         } finally {
