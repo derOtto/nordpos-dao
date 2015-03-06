@@ -22,8 +22,12 @@ import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+import java.util.Properties;
 import java.util.UUID;
 
 /**
@@ -46,8 +50,8 @@ public class Receipt {
     @DatabaseField(columnName = DATENEW, canBeNull = false, index = true, indexName = "RECEIPTS_INX_1")
     private Date date;
 
-    @DatabaseField(columnName = ATTRIBUTES, dataType = DataType.SERIALIZABLE)
-    byte[] attributes;
+    @DatabaseField(columnName = ATTRIBUTES, dataType = DataType.BYTE_ARRAY)
+    byte[] properties;
 
     @ForeignCollectionField
     ForeignCollection<Payment> paymentCollection;
@@ -81,12 +85,18 @@ public class Receipt {
         this.date = date;
     }
 
-    public byte[] getAttributes() {
-        return attributes;
+    public Properties getProperties() throws IOException {
+        Properties p = new Properties();
+        if (this.properties != null) {
+            p.loadFromXML(new ByteArrayInputStream(this.properties));
+        }
+        return p;
     }
 
-    public void setAttributes(byte[] attributes) {
-        this.attributes = attributes;
+    public void setProperties(Properties p) throws IOException {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        p.storeToXML(outputStream, "Receipt properties", "UTF-8");
+        this.properties = outputStream.toByteArray();
     }
 
     public ForeignCollection<Payment> getPaymentCollection() {
