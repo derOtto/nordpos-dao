@@ -19,26 +19,31 @@ package mobi.nordpos.dao.model;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
-import java.util.List;
 import java.util.UUID;
+import static mobi.nordpos.dao.model.AttributeUse.ATTRIBUTESET_ID;
 
 /**
  * @author Andrey Svininykh <svininykh@gmail.com>
  */
 @DatabaseTable(tableName = "ATTRIBUTE")
-public class Attribute {
+public class AttributeValue {
 
     public static final String ID = "ID";
-    public static final String NAME = "NAME";
+    public static final String ATTRIBUTE_ID = "ATTRIBUTE_ID";
+    public static final String VALUE = "VALUE";
 
     @DatabaseField(generatedId = true, columnName = ID)
     private UUID id;
 
-    @DatabaseField(columnName = NAME, unique = true, canBeNull = false)
-    private String name;
+    @DatabaseField(foreign = true,
+            columnName = ATTRIBUTE_ID,
+            foreignColumnName = Attribute.ID,
+            foreignAutoRefresh = true,
+            canBeNull = false)
+    private Attribute attribute;
 
-    @DatabaseField(persisted = false)
-    private List<AttributeValue> attributeValueList;
+    @DatabaseField(columnName = VALUE)
+    private String value;
 
     public UUID getId() {
         return id;
@@ -48,25 +53,25 @@ public class Attribute {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public Attribute getAttribute() {
+        return attribute;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setAttribute(Attribute attribute) {
+        this.attribute = attribute;
     }
 
-    public List<AttributeValue> getAttributeValueList() {
-        return attributeValueList;
+    public String getValue() {
+        return value;
     }
 
-    public void setAttributeValueList(List<AttributeValue> attributeValueList) {
-        this.attributeValueList = attributeValueList;
+    public void setValue(String value) {
+        this.value = value;
     }
 
     @Override
     public int hashCode() {
-        return name.hashCode();
+        return id.hashCode();
     }
 
     @Override
@@ -74,7 +79,7 @@ public class Attribute {
         if (other == null || other.getClass() != getClass()) {
             return false;
         }
-        return name.equals(((Attribute) other).name);
+        return id.equals(((AttributeValue) other).id);
     }
 
 }
