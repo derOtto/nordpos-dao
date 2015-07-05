@@ -53,7 +53,7 @@ public class AttributeUsePersist implements PersistFactory {
     @Override
     public List<AttributeUse> readList() throws SQLException {
         try {
-            QueryBuilder qb = attributeUseDao.queryBuilder();
+            QueryBuilder qb = attributeUseDao.queryBuilder().orderBy(AttributeUse.ATTRIBUTESET_ID, true).orderBy(AttributeUse.LINENO, true);
             qb.where().isNotNull(AttributeUse.ID);
             return qb.query();
         } finally {

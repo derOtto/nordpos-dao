@@ -30,7 +30,7 @@ public class Attribute {
     public static final String ID = "ID";
     public static final String NAME = "NAME";
 
-    @DatabaseField(id = true, columnName = ID, generatedId = true)
+    @DatabaseField(generatedId = true, columnName = ID)
     private UUID id;
 
     @DatabaseField(columnName = NAME, unique = true, canBeNull = false)

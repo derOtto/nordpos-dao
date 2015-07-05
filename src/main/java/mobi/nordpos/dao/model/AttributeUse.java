@@ -32,7 +32,7 @@ public class AttributeUse {
     public static final String ATTRIBUTE_ID = "ATTRIBUTE_ID";
     public static final String LINENO = "LINENO";
 
-    @DatabaseField(id = true, columnName = ID, generatedId = true)
+    @DatabaseField(generatedId = true, columnName = ID)
     private UUID id;
 
     @DatabaseField(foreign = true,

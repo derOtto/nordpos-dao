@@ -1,6 +1,6 @@
 /**
  * Copyright (c) 2012-2015 Nord Trading Network.
- * 
+ *
  * http://www.nordpos.mobi
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -19,6 +19,7 @@ package mobi.nordpos.dao.model;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -30,12 +31,14 @@ public class AttributeSet {
     public static final String ID = "ID";
     public static final String NAME = "NAME";
 
-    @DatabaseField(id = true, columnName = ID, generatedId = true)
+    @DatabaseField(generatedId = true, columnName = ID)
     private UUID id;
 
     @DatabaseField(columnName = NAME, unique = true, canBeNull = false)
     private String name;
 
+    @DatabaseField(persisted = false)
+    private List<Attribute> attributeList;
 
     public UUID getId() {
         return id;
@@ -51,6 +54,14 @@ public class AttributeSet {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public List<Attribute> getAttributeList() {
+        return attributeList;
+    }
+
+    public void setAttributeList(List<Attribute> attributeList) {
+        this.attributeList = attributeList;
     }
 
     @Override
