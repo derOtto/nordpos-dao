@@ -104,6 +104,6 @@ public class ClosedCash {
         if (other == null || other.getClass() != getClass()) {
             return false;
         }
-        return host.equals(((ClosedCash) other).host) && host.equals(((ClosedCash) other).host);
+        return host.equals(((ClosedCash) other).host);
     }
 }

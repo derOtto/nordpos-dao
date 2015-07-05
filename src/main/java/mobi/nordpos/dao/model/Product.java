@@ -44,6 +44,7 @@ public class Product {
     public static final String IMAGE = "IMAGE";
     public static final String ISCOM = "ISCOM";
     public static final String ATTRIBUTES = "ATTRIBUTES";
+    public static final String ATTRIBUTESET = "ATTRIBUTESET_ID";
 
     @DatabaseField(id = true, columnName = ID)
     private String id;
@@ -85,6 +86,13 @@ public class Product {
             foreignAutoRefresh = true,
             canBeNull = false)
     private TaxCategory taxCategory;
+
+    @DatabaseField(foreign = true,
+            columnName = ATTRIBUTESET,
+            foreignColumnName = AttributeSet.ID,
+            foreignAutoRefresh = true,
+            canBeNull = false)
+    private AttributeSet attributeSet;
 
     @DatabaseField(persisted = false)
     private Tax tax;
@@ -180,6 +188,14 @@ public class Product {
 
     public void setTaxCategory(TaxCategory taxCategory) {
         this.taxCategory = taxCategory;
+    }
+
+    public AttributeSet getAttributeSet() {
+        return attributeSet;
+    }
+
+    public void setAttributeSet(AttributeSet attributeSet) {
+        this.attributeSet = attributeSet;
     }
 
     public Tax getTax() {
