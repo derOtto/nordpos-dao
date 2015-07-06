@@ -17,7 +17,9 @@
  */
 package mobi.nordpos.dao.model;
 
+import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
 import java.util.List;
 import java.util.UUID;
@@ -37,6 +39,9 @@ public class Attribute {
     @DatabaseField(columnName = NAME, unique = true, canBeNull = false)
     private String name;
 
+    @ForeignCollectionField(orderAscending = true, orderColumnName = AttributeValue.VALUE, eager = true)
+    private ForeignCollection<AttributeValue> attributeValueCollection;
+
     @DatabaseField(persisted = false)
     private List<AttributeValue> attributeValueList;
 
@@ -54,6 +59,10 @@ public class Attribute {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public ForeignCollection<AttributeValue> getAttributeValueCollection() {
+        return attributeValueCollection;
     }
 
     public List<AttributeValue> getAttributeValueList() {

@@ -17,12 +17,15 @@
  */
 package mobi.nordpos.dao.factory;
 
+import com.j256.ormlite.dao.CloseableWrappedIterable;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.support.ConnectionSource;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import mobi.nordpos.dao.model.Attribute;
+import mobi.nordpos.dao.model.AttributeValue;
 import mobi.nordpos.dao.ormlite.AttributeDao;
 
 /**
@@ -109,4 +112,16 @@ public class AttributePersist implements PersistFactory {
         }
     }
 
+    public List<AttributeValue> readAttributeValueList(Attribute attribute) throws SQLException {
+        CloseableWrappedIterable<AttributeValue> iterator = attribute.getAttributeValueCollection().getWrappedIterable();
+        List<AttributeValue> list = new ArrayList<>();
+        try {
+            for (AttributeValue value : iterator) {
+                list.add(value);
+            }
+            return list;
+        } finally {
+            iterator.close();
+        }
+    }
 }

@@ -20,12 +20,11 @@ package mobi.nordpos.dao.model;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import java.util.UUID;
-import static mobi.nordpos.dao.model.AttributeUse.ATTRIBUTESET_ID;
 
 /**
  * @author Andrey Svininykh <svininykh@gmail.com>
  */
-@DatabaseTable(tableName = "ATTRIBUTE")
+@DatabaseTable(tableName = "ATTRIBUTEVALUE")
 public class AttributeValue {
 
     public static final String ID = "ID";
