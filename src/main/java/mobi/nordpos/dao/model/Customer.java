@@ -38,6 +38,7 @@ public class Customer {
     public static final String ID = "ID";
     public static final String NAME = "NAME";
     public static final String SEARCHKEY = "SEARCHKEY";
+    public static final String TAXID = "TAXID";
     public static final String TAXCATEGORY = "TAXCATEGORY";
     public static final String EMAIL = "EMAIL";
     public static final String PROPERTIES = "PROPERTIES";
@@ -51,7 +52,10 @@ public class Customer {
     private String name;
 
     @DatabaseField(columnName = SEARCHKEY, canBeNull = false)
-    private String searchkey;
+    private String searchKey;
+    
+    @DatabaseField(columnName = TAXID, canBeNull = true)
+    private String taxpayerId;
 
     @DatabaseField(foreign = true,
             columnName = TAXCATEGORY,
@@ -82,12 +86,20 @@ public class Customer {
         this.name = name;
     }
 
-    public String getSearchkey() {
-        return searchkey;
+    public String getSearchKey() {
+        return searchKey;
     }
 
-    public void setSearchkey(String searchkey) {
-        this.searchkey = searchkey;
+    public void setSearchKey(String searchKey) {
+        this.searchKey = searchKey;
+    }
+
+    public String getTaxpayerId() {
+        return taxpayerId;
+    }
+
+    public void setTaxpayerId(String taxpayerId) {
+        this.taxpayerId = taxpayerId;
     }
 
     public TaxCategory getTaxCategory() {
