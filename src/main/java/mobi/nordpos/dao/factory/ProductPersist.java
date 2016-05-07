@@ -22,6 +22,8 @@ import com.j256.ormlite.support.ConnectionSource;
 import java.sql.SQLException;
 import java.util.List;
 import mobi.nordpos.dao.model.Product;
+import mobi.nordpos.dao.model.ProductCategory;
+import mobi.nordpos.dao.ormlite.ProductCategoryDao;
 import mobi.nordpos.dao.ormlite.ProductDao;
 
 /**
@@ -31,11 +33,13 @@ public class ProductPersist implements PersistFactory {
 
     ConnectionSource connectionSource;
     ProductDao productDao;
+    ProductCategoryDao categoryDao;
 
     @Override
     public void init(ConnectionSource connectionSource) throws SQLException {
         this.connectionSource = connectionSource;
         productDao = new ProductDao(connectionSource);
+        categoryDao = new ProductCategoryDao(connectionSource);
     }
 
     @Override
@@ -61,6 +65,20 @@ public class ProductPersist implements PersistFactory {
             }
         }
     }
+    
+    public List<Product> readList(ProductCategory category) throws SQLException {
+        try {
+            QueryBuilder productQB = productDao.queryBuilder().orderBy(Product.CATEGORY, true);
+            QueryBuilder categoryQB = categoryDao.queryBuilder().orderBy(ProductCategory.ID, true);
+            productQB.join(categoryQB);
+            productQB.where().eq(Product.CATEGORY, category.getId());
+            return productQB.query();
+        } finally {
+            if (connectionSource != null) {
+                connectionSource.close();
+            }
+        }
+    }    
 
     @Override
     public Product find(String column, Object value) throws SQLException {
