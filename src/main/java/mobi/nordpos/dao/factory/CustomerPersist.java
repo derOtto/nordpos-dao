@@ -19,11 +19,12 @@ package mobi.nordpos.dao.factory;
 
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.support.ConnectionSource;
+import mobi.nordpos.dao.model.Customer;
+import mobi.nordpos.dao.ormlite.CustomerDao;
+
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
-import mobi.nordpos.dao.model.Customer;
-import mobi.nordpos.dao.ormlite.CustomerDao;
 
 /**
  * @author Andrey Svininykh <svininykh@gmail.com>
